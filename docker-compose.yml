@@ -9,6 +9,8 @@ services:
     volumes:
       # Mount source so edits are reflected without rebuilding
       - ./src:/app/src
+      - ./scripts:/app/scripts
+      - ./Makefile:/app/Makefile
       - ./tests:/app/tests
       - ./notebooks:/app/notebooks
       - ./reports:/app/reports

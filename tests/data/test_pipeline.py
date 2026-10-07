@@ -40,6 +40,10 @@ class TestProcessedDataset:
         assert features.min().min() >= 0.0
         assert features.max().max() <= 1.0
 
+    def test_adjusted_close_excluded(self, processed):
+        # Back-adjusted prices are revised with later dividends (look-ahead)
+        assert "Adj Close" not in processed.columns
+
     @pytest.mark.parametrize("cut", [800, 1000])
     def test_no_lookahead_end_to_end(self, pipeline, raw, processed, cut):
         # Rebuilding the dataset without the data after `cut` must leave

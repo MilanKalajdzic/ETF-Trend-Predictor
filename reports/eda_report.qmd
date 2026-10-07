@@ -142,6 +142,11 @@ dated after the last trading day, are also discarded. The check runs in
 the unit tests, so a library upgrade that introduces a new look-ahead
 indicator fails the build.
 
+The raw `Adj Close` column is excluded from the features as well: Yahoo
+back-adjusts it with dividends paid after each day, so its historical
+values are revised whenever a new dividend arrives. Indicators are
+computed on the unadjusted `Close`.
+
 | Category | Examples |
 |----------|---------|
 | Candles | Candlestick patterns |

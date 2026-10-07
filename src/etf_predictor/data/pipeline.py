@@ -114,8 +114,12 @@ class DataPipeline:
             cache_dir=self.cache_dir,
             include_benchmark=self.include_benchmark,
         )
+        # "Adj Close" is excluded from the features: Yahoo back-adjusts it
+        # with dividends paid after each day, so its value at day t is
+        # revised whenever a later dividend arrives (look-ahead).
         self._indicator_engine = TechnicalIndicators(
-            categories=self.indicator_categories
+            categories=self.indicator_categories,
+            exclude_cols=["Adj Close"],
         )
         self._target_builder = TargetBuilder(
             horizon=self.horizon,
