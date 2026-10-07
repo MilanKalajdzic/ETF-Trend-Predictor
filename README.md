@@ -22,7 +22,7 @@
   <a href="#quick-start">Quick start</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="#results">Results</a> ·
-  <a href="#look-ahead-audit">Look-ahead audit</a> ·
+  <a href="#look-ahead-safety">Look-ahead safety</a> ·
   <a href="#reports">Reports</a> ·
   <a href="#development">Development</a> ·
   <a href="#limitations">Limitations</a>
@@ -98,6 +98,11 @@ flowchart LR
 
 ## Results
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/results-equity-dark.png">
+  <img src="assets/results-equity-light.png" alt="Out-of-sample equity curves of the MLP and LSTM long/short strategies against buy-and-hold for IEUR, FEZ, EUFN and IVV, log scale" width="100%">
+</picture>
+
 Out-of-sample walk-forward results, trading long/short on each model's daily signal, with all features and with only the top-10 Random Forest features. Annualised Sharpe ratios, no transaction costs:
 
 | Ticker | MLP | LSTM | MLP top-10 | LSTM top-10 | Buy & hold |
@@ -115,22 +120,14 @@ Per-fold metrics and equity curves are in the modeling report.
 
 ---
 
-## Look-ahead audit
+## Look-ahead safety
 
-The first version of this pipeline reported Sharpe ratios above 1.5 and total returns over 2,600%. Tracing those numbers uncovered four kinds of look-ahead leakage, all now fixed and covered by tests:
+Backtests on technical indicators are easy to contaminate with future information, so the pipeline guards against it explicitly:
 
-- **Non-causal indicators.** Five pandas-ta indicators use future prices with their default settings: DPO (centred), the Ichimoku chikou span, the `TOS_STDEVALL` regression bands, VHM and ZIGZAG. They were found by recomputing every indicator on data truncated at day t and checking whether any earlier value changed.
-- **Fake future rows.** Ichimoku's forward projections, dated after the last trading day, were being appended to the dataset.
-- **Full-sample scaling.** Min-max scaling used the whole history, so every walk-forward fold saw the future range of each feature. It now uses an expanding window.
-- **Adjusted prices.** Yahoo's `Adj Close` is back-adjusted with dividends paid later, so it was dropped as a feature.
-
-| Run (all features) | Sharpe before | Sharpe after | Total return before | Total return after |
-|:---|---:|---:|---:|---:|
-| FEZ LSTM | 1.67 | 0.05 | +2,613% | +14% |
-| EUFN LSTM | 1.55 | 0.24 | +2,883% | +94% |
-| EUFN MLP | 1.00 | 0.60 | +905% | +402% |
-
-An end-to-end test now rebuilds the processed dataset with the future cut off and fails if any past value changes.
+- **Causal indicators only.** Every pandas-ta indicator is recomputed on data truncated at day t and dropped if any earlier value changes. Five fail with their default settings and are excluded: DPO (centred), the Ichimoku chikou span, the `TOS_STDEVALL` regression bands, VHM and ZIGZAG. Ichimoku's forward projections, dated after the last trading day, are discarded.
+- **Expanding-window scaling.** Features are min-max scaled with the range observed up to each day, never the full sample, so walk-forward folds see no future ranges.
+- **Unadjusted prices.** Yahoo's `Adj Close` is back-adjusted with dividends paid later, so indicators are computed on the raw close.
+- **End-to-end test.** The test suite rebuilds the processed dataset with the future cut off and fails if any past value changes.
 
 ---
 
