@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ETF Trend Predictor</title>
+<meta name="description" content="Can technical indicators beat buy-and-hold on European ETFs? A reproducible replication of Sagaceta-Mejía et al. (2024) with walk-forward MLP and LSTM backtests.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ETF Trend Predictor">
+<meta property="og:description" content="Can technical indicators beat buy-and-hold on European ETFs? Walk-forward MLP and LSTM backtests on IEUR, FEZ, EUFN and IVV.">
+<meta property="og:url" content="https://milankalajdzic.github.io/ETF-Trend-Predictor/">
+<meta property="og:image" content="https://milankalajdzic.github.io/ETF-Trend-Predictor/assets/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #ffffff;
+    --ink: #18202b;
+    --ink-2: #4e5a68;
+    --rule: #d8dde3;
+    --link: #1f5fae;
+    --code-bg: #eef1f4;
+    --button-ink: #ffffff;
+    --measure: 38rem;
+    --wide: 60rem;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0d1117;
+      --ink: #e8ecf1;
+      --ink-2: #9aa6b4;
+      --rule: #26303b;
+      --link: #8ab8f2;
+      --code-bg: #171d25;
+      --button-ink: #0d1117;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Archivo", system-ui, sans-serif;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    font-variation-settings: "wdth" 100;
+  }
+  a { color: var(--link); text-underline-offset: 0.18em; }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--link);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .page {
+    max-width: var(--wide);
+    margin: 0 auto;
+    padding: 0 1.25rem 4rem;
+  }
+
+  .site-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 1.5rem 0 0;
+  }
+  .site-name {
+    font-weight: 700;
+    font-variation-settings: "wdth" 87;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .site-links { display: flex; gap: 1.25rem; font-size: 0.95rem; }
+
+  .hero { padding: 4.5rem 0 2.5rem; }
+  .hero h1 {
+    margin: 0;
+    max-width: 14em;
+    font-size: clamp(2.5rem, 6.4vw, 4.6rem);
+    line-height: 1.0;
+    font-weight: 750;
+    font-variation-settings: "wdth" 72;
+    letter-spacing: -0.01em;
+  }
+  .lead {
+    max-width: var(--measure);
+    margin: 1.75rem 0 0;
+    font-size: 1.2rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .lead strong { color: var(--ink); font-weight: 600; }
+  .nowrap { white-space: nowrap; }
+  .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+  .button {
+    display: inline-block;
+    padding: 0.7rem 1.15rem;
+    border: 1.5px solid var(--ink);
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .button-primary { background: var(--ink); color: var(--button-ink); }
+  .button-secondary { color: var(--ink); }
+  .button:hover { text-decoration: underline; }
+
+  figure { margin: 1.5rem 0 0; }
+  figure img { display: block; width: 100%; height: auto; }
+  figcaption {
+    max-width: var(--measure);
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--ink-2);
+  }
+
+  section { margin-top: 4.5rem; }
+  h2 {
+    margin: 0 0 1.25rem;
+    font-size: 1.6rem;
+    line-height: 1.2;
+    font-weight: 700;
+    font-variation-settings: "wdth" 80;
+  }
+  section > p { max-width: var(--measure); }
+
+  .reports { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+  .reports li { border-bottom: 1px solid var(--rule); }
+  .reports a {
+    display: grid;
+    grid-template-columns: minmax(12rem, 1fr) 2fr;
+    gap: 0.25rem 2rem;
+    padding: 1.15rem 0;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .reports .title {
+    font-size: 1.25rem;
+    font-weight: 650;
+    font-variation-settings: "wdth" 87;
+    color: var(--link);
+  }
+  .reports a:hover .title { text-decoration: underline; }
+  .reports .what { color: var(--ink-2); max-width: var(--measure); }
+
+  .facts {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.6rem 2rem;
+    margin: 0;
+    max-width: 48rem;
+  }
+  .facts dt { font-weight: 600; }
+  .facts dd { margin: 0; color: var(--ink-2); }
+
+  .code {
+    position: relative;
+    max-width: 44rem;
+    margin-top: 1.25rem;
+    background: var(--code-bg);
+    border-radius: 6px;
+  }
+  .code pre {
+    margin: 0;
+    padding: 1rem 1.15rem;
+    overflow-x: auto;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.88rem;
+    line-height: 1.7;
+  }
+  .copy {
+    position: absolute;
+    top: 0.55rem;
+    right: 0.55rem;
+    padding: 0.3rem 0.65rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--paper);
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  footer {
+    margin-top: 5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.9rem;
+    color: var(--ink-2);
+  }
+  footer p { max-width: var(--measure); margin: 0 0 0.5rem; }
+
+  @media (max-width: 40rem) {
+    .hero { padding-top: 3rem; }
+    .reports a { grid-template-columns: 1fr; }
+    .facts { grid-template-columns: 1fr; gap: 0.15rem; }
+    .facts dd { margin-bottom: 0.75rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="site-header">
+    <a class="site-name" href="./">ETF Trend Predictor</a>
+    <nav class="site-links" aria-label="External links">
+      <a href="https://github.com/MilanKalajdzic/ETF-Trend-Predictor">GitHub</a>
+      <a href="https://hub.docker.com/r/milankalajdzic/etf-predictor">Docker Hub</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>Can technical indicators beat <span class="nowrap">buy-and-hold</span> on European ETFs?</h1>
+      <p class="lead">
+        <strong>Mostly not.</strong> We rebuilt the method of Sagaceta-Mejía et al. (2024) for
+        three European ETFs and the S&amp;P 500: about 250 technical indicators, an MLP and an
+        LSTM, and a strict walk-forward backtest from 2014 to 2026. Three of 16 model runs beat
+        buy-and-hold before costs, and none still does once trading costs reach 6 bps a trade.
+      </p>
+      <div class="actions">
+        <a class="button button-primary" href="reports/modeling_report.html">Read the modeling report</a>
+        <a class="button button-secondary" href="https://github.com/MilanKalajdzic/ETF-Trend-Predictor">View the code</a>
+      </div>
+    </div>
+
+    <figure>
+      <a href="assets/results-equity-light.png" aria-label="Open the equity curve chart at full size">
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="assets/results-equity-dark.png">
+          <img src="assets/results-equity-light.png" width="1800" height="1320"
+               alt="Out-of-sample equity curves of the MLP and LSTM strategies against buy-and-hold for IEUR, FEZ, EUFN and IVV, on a log scale.">
+        </picture>
+      </a>
+      <figcaption>
+        Each panel compares the two networks with buy-and-hold on one ETF. Only the EUFN MLP
+        pulls clearly ahead, and most of its gain comes from ten trading days, most of them in
+        the March 2020 crash and the April 2025 tariff selloff.
+      </figcaption>
+    </figure>
+
+    <section aria-labelledby="reports">
+      <h2 id="reports">Reports</h2>
+      <ul class="reports">
+        <li>
+          <a href="reports/eda_report.html">
+            <span class="title">Data preparation</span>
+            <span class="what">Prices from Yahoo Finance, the indicator set and how it was checked for look-ahead, the target Γ(t), class balance and cleaning.</span>
+          </a>
+        </li>
+        <li>
+          <a href="reports/statistical_analysis.html">
+            <span class="title">Statistical analysis</span>
+            <span class="what">Feature variance and redundancy, Random Forest feature importance, stationarity tests and an ARIMA baseline.</span>
+          </a>
+        </li>
+        <li>
+          <a href="reports/modeling_report.html">
+            <span class="title">Modeling and backtests</span>
+            <span class="what">MLP and LSTM walk-forward results per ETF, equity curves, the top-10 feature experiment and trading-cost sensitivity.</span>
+          </a>
+        </li>
+        <li>
+          <a href="docs/">
+            <span class="title">API reference</span>
+            <span class="what">Documentation for every class and function in the <code>etf_predictor</code> package.</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="setup">
+      <h2 id="setup">How the experiment works</h2>
+      <dl class="facts">
+        <dt>ETFs</dt>
+        <dd>IEUR (broad Europe), FEZ (Euro Stoxx 50) and EUFN (European financials), with IVV (S&amp;P 500) as a benchmark</dd>
+        <dt>Data</dt>
+        <dd>Daily prices from Yahoo Finance, 2010 to April 2026</dd>
+        <dt>Features</dt>
+        <dd>About 250 pandas-ta indicators, each tested to make sure it only uses past prices</dd>
+        <dt>Models</dt>
+        <dd>An MLP that classifies the daily direction and an LSTM that predicts the next day's return</dd>
+        <dt>Validation</dt>
+        <dd>Expanding-window walk-forward: retrain on all history so far, test on the next six months, repeat</dd>
+        <dt>Trading</dt>
+        <dd>Long or short every day on the model's signal, compared with buying and holding the same ETF</dd>
+      </dl>
+    </section>
+
+    <section aria-labelledby="run">
+      <h2 id="run">Run it yourself</h2>
+      <p>One Docker image runs the whole pipeline, from downloading prices to rendering the three reports, in 10 to 15 minutes on a laptop CPU.</p>
+      <div class="code">
+        <button class="copy" type="button" data-target="run-cmd">Copy</button>
+<pre id="run-cmd"><code>docker pull milankalajdzic/etf-predictor:latest
+mkdir output
+docker run --rm -v "$PWD/output:/output" milankalajdzic/etf-predictor:latest</code></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      Based on Sagaceta-Mejía, Sánchez-Gutiérrez and Fresán-Figueroa (2024),
+      <a href="https://doi.org/10.1515/econ-2022-0073">“An intelligent approach for predicting stock market movements in emerging markets using optimized technical indicators and neural networks”</a>, Economics 18.
+    </p>
+    <p>Source code, tests and the Docker setup are on <a href="https://github.com/MilanKalajdzic/ETF-Trend-Predictor">GitHub</a>.</p>
+  </footer>
+</div>
+<script>
+  document.querySelectorAll(".copy").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var text = document.getElementById(button.dataset.target).innerText;
+      navigator.clipboard.writeText(text).then(function () {
+        button.textContent = "Copied";
+        setTimeout(function () { button.textContent = "Copy"; }, 1600);
+      });
+    });
+  });
+</script>
+</body>
+</html>

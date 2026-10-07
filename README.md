@@ -12,10 +12,14 @@
 </p>
 
 <p align="center">
-  <b>Can 260+ technical indicators and a neural network call tomorrow's direction for European ETFs?</b><br>
+  <b>Can 250 technical indicators and a neural network call tomorrow's direction for European ETFs?</b><br>
   A reproducible replication and extension of
   <a href="https://doi.org/10.1515/econ-2022-0073">Sagaceta-Mejía et al. (2024)</a>,
   from raw prices to rendered reports in a single <code>docker run</code>.
+</p>
+
+<p align="center">
+  <a href="https://milankalajdzic.github.io/ETF-Trend-Predictor/"><b>Project site and live reports</b></a>
 </p>
 
 <p align="center">
@@ -66,7 +70,7 @@ docker run --rm -v "${PWD}/output:/output" milankalajdzic/etf-predictor:latest
 
 </details>
 
-The default command (`make report`) runs the whole pipeline from scratch: download and process data, statistical analysis, MLP and LSTM walk-forward training, render all three Quarto reports and copy them to `output/`. Expect **about 10 minutes** on CPU.
+The default command (`make report`) runs the whole pipeline from scratch: download and process data, statistical analysis, MLP and LSTM walk-forward training, render all three Quarto reports and copy them to `output/`. Expect **10 to 15 minutes** on CPU.
 
 > [!TIP]
 > On Apple Silicon, if the pull fails, add `--platform linux/amd64` to both the `pull` and `run` commands.
@@ -112,7 +116,7 @@ Out-of-sample walk-forward results, trading long/short on each model's daily sig
 | EUFN | 0.60 | −0.04 | 0.54 | 0.11 | 0.15 |
 | IVV | −0.26 | 0.30 | −0.14 | 0.28 | 0.66 |
 
-**The short version: technical indicators do not beat the market here.** On the US benchmark buy-and-hold earns a Sharpe of 0.66 and the best network reaches 0.30. On IEUR nothing comes close to buy-and-hold, and on FEZ only the top-10 LSTM edges past it (0.23 against 0.17), a gap that is gone at 2 bps of trading cost.
+**The short version: technical indicators do not beat the market here.** On the US benchmark buy-and-hold earns a Sharpe of 0.66 and the best network reaches 0.30. On IEUR nothing comes close to buy-and-hold, and on FEZ only the top-10 LSTM edges past it (0.23 against 0.17), a gap that is gone at 1 bp of trading cost.
 
 EUFN is the one exception, with the MLP at 0.60 (0.54 on the top-10 features) against 0.15 for buy-and-hold. We do not read this as an edge. Its hit rate is barely above 50%, and 59% of its log return comes from just ten days, most of them in the March 2020 crash and the April 2025 tariff selloff. A Sharpe of 0.60 over 12 years is a t-statistic of about 2.1, which does not survive a correction for the 16 runs in this table, and most of the edge disappears once trading costs are charged (below).
 
@@ -126,7 +130,7 @@ The networks change position 25 to 107 times a year, so trading costs matter. [`
 | EUFN MLP top-10 | 87 | 0.54 | 0.38 | 0.15 | 7.1 bps | 0.15 |
 | FEZ LSTM top-10 | 82 | 0.23 | 0.06 | −0.17 | 2.8 bps | 0.17 |
 
-At 2 bps per trade the FEZ LSTM falls below buy-and-hold, and at 5 bps the EUFN MLP is level with it, before any cost of holding the short side. The table for all 16 runs is in `reports/results/cost_sensitivity.csv`.
+At 1 bp per trade the FEZ LSTM is already below buy-and-hold, and at about 5.5 bps the EUFN MLP loses its edge too, before any cost of holding the short side. The table for all 16 runs is in `reports/results/cost_sensitivity.csv`.
 
 Per-fold metrics and equity curves are in the modeling report.
 
@@ -145,7 +149,7 @@ Backtests on technical indicators are easy to contaminate with future informatio
 
 ## Reports
 
-Running the pipeline produces three self-contained HTML reports:
+Running the pipeline produces three self-contained HTML reports. The latest versions are also on the [project site](https://milankalajdzic.github.io/ETF-Trend-Predictor/), together with the [API reference](https://milankalajdzic.github.io/ETF-Trend-Predictor/docs/).
 
 | Report | Source | Contents |
 |---|---|---|
