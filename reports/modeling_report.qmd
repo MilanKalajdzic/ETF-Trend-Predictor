@@ -124,7 +124,7 @@ the warm-up window.
 ### 2.3 Why two architectures?
 
 - The MLP captures **point-in-time pattern recognition** across the
-  ~260 indicators built in the preprocessing stage.
+  ~250 indicators built in the preprocessing stage.
 - The LSTM captures **temporal dependence** across the trailing
   20-day window of those same indicators and learns the size of
   returns rather than only the noisy ±1 label.
@@ -211,9 +211,9 @@ metrics_all = {
 
 ### 5.0 Results gallery — equity curves across all tickers
 
-A 2×2 view of every walk-forward equity curve. EUFN and FEZ are where
-both networks decisively beat the passive baseline; IEUR and IVV are
-where the buy-and-hold line dominates.
+A 2×2 view of every walk-forward equity curve. Only the EUFN MLP
+separates clearly from the passive baseline; on the other three ETFs
+the buy-and-hold line ends at or above both networks.
 
 ::: {layout-ncol=2}
 ![EUFN — equity curves](figures/equity_EUFN.png)
@@ -249,12 +249,15 @@ metrics_all["EUFN"].round(4)
 ![EUFN — per-fold directional accuracy](figures/fold_accuracy_EUFN.png)
 :::
 
-EUFN is the most favourable backdrop for the LSTM: the financials
-sector exhibits persistent trend behaviour that the regressor latches
-onto. The LSTM compounds to **~29×** the starting equity with a
-**Sharpe of 1.55**, far above buy-and-hold (~0.6× and Sharpe 0.19).
-The MLP also clears buy-and-hold (~7.8× total, Sharpe 0.94) but pays
-for it with a deeper intra-period drawdown profile during 2020.
+EUFN is the only ETF where a network clearly beats buy-and-hold. The
+MLP compounds to about 5× the starting equity (Sharpe 0.60) against
+1.5× for buy-and-hold (Sharpe 0.15), with a shallower maximum drawdown
+(−36% against −59%). The gain is concentrated: 59% of the MLP's log
+return comes from ten days, most of them in the March 2020 crash and
+the April 2025 tariff selloff, and in most other years the strategy is
+roughly flat. With a hit rate of 50.4%, this looks like being on the
+right side of a few extreme days rather than a persistent edge. The
+LSTM ends slightly below where it started (Sharpe −0.04).
 
 ### 5.2 FEZ — SPDR EURO STOXX 50
 
@@ -268,13 +271,10 @@ metrics_all["FEZ"].round(4)
 ![FEZ — per-fold directional accuracy](figures/fold_accuracy_FEZ.png)
 :::
 
-FEZ shows the **largest gap between the two architectures**: the LSTM
-delivers a Sharpe of **1.67** and ~26× total return, while the MLP
-loses money over the full out-of-sample window (negative total return,
-negative Sharpe). The MLP's per-fold accuracy barely clears 50% and
-several folds in 2021–2024 drag the strategy into a sustained
-drawdown, while the LSTM's price-anchored signal stays directionally
-correct on the larger swings.
+FEZ is a no-edge case. The MLP finishes almost exactly flat (Sharpe
+0.01) and the LSTM loses about a third of its starting equity (Sharpe
+−0.17), while buy-and-hold returns about 51% (Sharpe 0.17). Per-fold
+accuracy for both networks scatters around 50%.
 
 ### 5.3 IEUR — iShares Core MSCI Europe
 
@@ -288,13 +288,10 @@ metrics_all["IEUR"].round(4)
 ![IEUR — per-fold directional accuracy](figures/fold_accuracy_IEUR.png)
 :::
 
-IEUR is the **hardest case for both models**. Its data only begins in
-mid-2014, so only 13 folds are available (vs 22–23 for the other
-tickers) and the models have less history to learn from. Both networks
-trail buy-and-hold on Sharpe (0.15 / 0.01 vs 0.33) and several folds
-in 2022–2024 produce sub-50% directional accuracy. This is the
-clearest example that the two networks need a long, stable training
-history to outperform.
+IEUR has the shortest history. Its data only begins in mid-2014, so
+16 folds are available against 25 for the other tickers and the first
+model trains on less data. Both networks trail buy-and-hold on Sharpe
+(MLP 0.12, LSTM −0.12, buy-and-hold 0.28).
 
 ### 5.4 IVV — iShares Core S&P 500 (US benchmark)
 
@@ -308,14 +305,13 @@ metrics_all["IVV"].round(4)
 ![IVV — per-fold directional accuracy](figures/fold_accuracy_IVV.png)
 :::
 
-IVV is the **adversarial case**: a strong, persistent secular uptrend
-where buy-and-hold is extremely hard to beat. The benchmark compounds
-to ~3.4× with a Sharpe of 0.66, while both ML strategies underperform
-— the MLP turns slightly negative and the LSTM ekes out a marginal
-positive return. The directional-accuracy bars hover around 0.45–0.50
-on most folds, confirming that on a trending US large-cap index a ±1
-signal that occasionally goes short is structurally disadvantaged
-relative to staying long.
+IVV is the hardest benchmark to beat: a strong, persistent uptrend in
+which buy-and-hold compounds to about 3.7× with a Sharpe of 0.66. The
+LSTM is the better network here (Sharpe 0.30, about 1.85×), because
+its return target picks up the positive drift and it is long on about
+three days in four. The MLP is long only 61% of the time and loses
+money (Sharpe −0.26). On a trending index, any signal that spends a
+large share of days short gives up most of the drift.
 
 ### 5.5 Cross-ticker summary
 
@@ -331,19 +327,39 @@ summary
 
 Key takeaways from the table:
 
-- **LSTM wins on Sharpe in 3 of 4 tickers** (EUFN, FEZ, IVV vs MLP),
-  driven by the price-anchored target and the temporal context window.
-- **Both models beat buy-and-hold on the two European
-  sector/large-cap ETFs** (EUFN, FEZ) but lose to it on the broad
-  IEUR and the trending IVV.
-- **Drawdowns are model-dependent**: the LSTM occasionally accepts
-  larger drawdowns (EUFN −35%) in exchange for higher upside, while
-  the MLP tends to keep drawdowns slightly smaller but at the cost of
-  much lower returns.
-- **Hit rates cluster around 48–53%** across the board — i.e., the
-  signals are only marginally better than coin-flips on a per-day
-  basis, but the magnitude of correctly-called moves drives the
-  Sharpe advantage where it appears.
+- **Only one of eight full-feature runs beats buy-and-hold**: the
+  EUFN MLP (Sharpe 0.60 against 0.15), and that result rests on a
+  handful of crash days.
+- **Neither architecture dominates.** The MLP is ahead on the three
+  European ETFs, the LSTM on IVV.
+- **Hit rates cluster around 48–52%**: the daily signals are close to
+  a coin flip, so where a strategy does well the result comes from the
+  size of a few correctly called moves rather than from frequent
+  correct calls.
+- **Drawdowns are comparable to buy-and-hold or worse**, with the
+  exception of the EUFN MLP.
+
+### 5.6 Transaction costs
+
+The results above assume free trading. The networks change position
+25 to 107 times a year, so costs matter.
+`scripts/cost_sensitivity.py` re-scores every run with a one-way cost
+per unit traded (a long-to-short flip trades two units) and finds the
+cost at which each Sharpe ratio reaches zero.
+
+```{python}
+#| label: cost-sensitivity
+costs = pd.read_csv(RESULTS / "cost_sensitivity.csv")
+costs[[
+    "ticker", "model", "features", "flips_per_year",
+    "sharpe_0bps", "sharpe_2bps", "sharpe_5bps",
+    "breakeven_bps", "buy_and_hold_sharpe",
+]].round(2)
+```
+
+At 5 bps per trade the EUFN MLP falls to buy-and-hold levels, and the
+only other run that beats buy-and-hold before costs (FEZ LSTM on the
+top-10 features) falls below it at 2 bps.
 
 ---
 
@@ -373,7 +389,7 @@ pd.DataFrame.from_dict(top10, orient="index").T
 Across all four tickers, the top of the ranking is dominated by
 **Smart Money Concept** indicators (`SMCtp`, `SMCbi`, `SMCbp`,
 `SMCti`) and a handful of the same features called out in the paper's
-Selected(5) — **BOP**, **BBP** and (on EUFN/IVV) **PVR** — confirming
+Selected(5) — **BOP**, **BBP** and (on EUFN) **PVR** — confirming
 that the importance ranking surfaces broadly similar signals to the
 paper's statistical-measure pipeline.
 
@@ -436,58 +452,48 @@ for t in TICKERS:
 pd.DataFrame(rows).set_index(["ticker", "model"]).round(3)
 ```
 
-### 6.4 Interpretation — why our result diverges from the paper
+### 6.4 Interpretation
 
-The table makes the contrast unambiguous: **on this dataset and with
-this validation protocol, the full feature set wins for every
-ticker/model combination on a Sharpe basis.** The drop is dramatic on
-the cases where the full-feature model genuinely had an edge:
+Pruning to ten features does not have one consistent effect:
 
-- **EUFN** (LSTM): Sharpe collapses from **1.55 → −0.17**; the
-  ~29× total return becomes a small loss.
-- **FEZ** (LSTM): Sharpe drops from **1.67 → 0.20** and the strategy
-  no longer beats buy-and-hold.
-- **EUFN** (MLP): Sharpe drops from 0.94 → 0.44 but the model still
-  beats buy-and-hold.
-- **IEUR** and **IVV**: both models were already losing to
-  buy-and-hold on the full set, and they continue to do so under the
-  reduced set (slightly worse).
+- **MLP:** the full feature set is better on three of four tickers
+  (EUFN 0.60 → 0.54, FEZ 0.01 → −0.12, IEUR 0.12 → 0.04); only IVV
+  improves (−0.26 → −0.14), and it stays negative.
+- **LSTM:** the top-10 set is better on three of four tickers
+  (EUFN −0.04 → 0.11, FEZ −0.17 → 0.23, IEUR −0.12 → 0.12) and
+  roughly neutral on IVV (0.30 → 0.28).
 
-This is the *opposite* sign to the paper's headline finding. A few
-mechanical reasons our setup is unlikely to reproduce a ~2 pp
-accuracy gain from aggressive feature pruning:
+So the paper's finding that a small feature subset helps the MLP does
+not carry over to our setup, while the LSTM does benefit from fewer
+inputs. A few reasons the results differ from the paper:
 
 1. **Different validation protocol.** The paper uses **10-fold
    shuffled `StratifiedKFold`** (an i.i.d. assumption), which lets
    the MLP see future-dated rows during training. We use a strict
    **expanding-window walk-forward**, so every test row is genuinely
    out-of-sample. Shuffled CV scores on price series are well-known
-   to be optimistically biased — and feature subsets that look good
+   to be optimistically biased, and feature subsets that look good
    under shuffled CV often lose their edge under temporal validation.
 2. **Different feature pool.** The paper has 216 Pandas TA columns;
-   our pipeline produces ~260 (different Pandas TA version, plus the
-   SMC family that dominates the importance ranking). The "top of
-   the importance list" is therefore a different set of signals.
-3. **Different downstream task on the LSTM.** The paper's
-   feature-selection result was reported for the MLP only. Our LSTM
-   regresses next-day price, and a 10-feature LSTM has noticeably
-   less to chew on per timestep — collapsing the model's ability to
-   identify price dynamics. The LSTM is where we see the largest
-   Sharpe loss when features are stripped.
+   our pipeline produces about 250 (a different Pandas TA version,
+   plus the SMC family that dominates the importance ranking). The
+   top of the importance list is therefore a different set of
+   signals.
+3. **Model capacity.** With about 250 features in each of 20 time
+   steps and a few thousand training rows, the full-feature LSTM has
+   far more inputs than the data can support, so cutting to ten
+   features acts as regularisation. The MLP sees a single day at a
+   time and is less exposed to this.
 4. **Different dataset window.** The paper deliberately ends in
    2020-01 to exclude the COVID period; our backtest covers
-   2012-2026 including the 2020 shock, the 2022 rate cycle, and
-   2023-25 recovery — regimes where the wider feature set has more
-   distinct signals to lean on.
+   2014-2026, including the 2020 shock, the 2022 rate cycle and the
+   2023-25 recovery.
 
-The practical lesson is that **for our walk-forward backtest, the
-extra ~250 features are *not* redundant** — they materially help the
-model handle regime shifts. Reducing to a handful of features only
-makes sense if (a) we can re-tune model capacity and (b) we accept a
-much smoother but lower-Sharpe equity curve. A middle-ground
-experiment (e.g. top 30–60 features, possibly with category quotas
-matching the paper's Selected(5) distribution) is the natural next
-step.
+Given how close most of these Sharpe ratios are to zero, and that each
+model is trained with a single seed, the differences between feature
+sets are small relative to the noise. A middle-ground experiment (for
+example the top 30 to 60 features, retrained over several seeds) is
+the natural next step.
 
 ---
 
@@ -502,6 +508,9 @@ make modeling
 # top-10 features per ticker (suffix keeps the baseline files intact)
 PYTHONPATH=src python scripts/run_modeling.py \
     --top-k-features 10 --feature-suffix _top10
+
+# Sharpe ratios net of transaction costs for every saved run
+PYTHONPATH=src python scripts/cost_sensitivity.py
 ```
 
 Useful CLI flags:
@@ -528,18 +537,24 @@ Each run regenerates (with optional `<suffix>` from `--feature-suffix`):
 
 ## 8. Limitations & next steps
 
-- **Transaction costs and slippage are not modeled.** With a daily
-  ±1 signal that frequently flips, real-world fills and the
-  bid/ask spread would erode a meaningful slice of the reported
-  Sharpe — most aggressively on the LSTM's higher-turnover folds.
+- **Simple cost model.** Trading costs are a flat charge per unit
+  traded (section 5.6). Borrowing costs for the short side, the
+  bid/ask spread at the open and market impact are not modelled.
+- **Same-day training label for the MLP.** Following the paper, the
+  MLP learns Γ(t), which is already known by the close of day *t*,
+  while its signal trades the following day's return. Training on a
+  next-day target would match what the model learns to what it
+  trades.
+- **One seed per model.** Each network is trained with a single fixed
+  seed, so the spread of these Sharpe ratios across training runs is
+  unknown.
 - **Position sizing is binary.** A confidence-weighted sizing scheme
-  (e.g. scaling by predicted probability or predicted return
-  magnitude) would likely smooth the equity curves and improve
-  risk-adjusted returns.
+  (scaling by predicted probability or predicted return magnitude)
+  would likely smooth the equity curves.
 - **No hyper-parameter search.** Architecture sizes, epoch counts,
-  dropout, and sequence length are fixed at sensible defaults. A
-  walk-forward-aware tuning loop (e.g. nested CV on the training
-  block) would be the natural next step.
+  dropout and sequence length are fixed at sensible defaults. A
+  walk-forward-aware tuning loop (e.g. nested validation on the
+  training block) would be the natural next step.
 
 ---
 

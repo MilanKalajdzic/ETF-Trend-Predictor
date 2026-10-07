@@ -107,27 +107,26 @@ Out-of-sample walk-forward results, trading long/short on each model's daily sig
 
 | Ticker | MLP | LSTM | MLP top-10 | LSTM top-10 | Buy & hold |
 |:---|---:|---:|---:|---:|---:|
-| IEUR | 0.12 | −0.01 | 0.04 | 0.29 | 0.28 |
-| FEZ | 0.01 | 0.05 | −0.12 | 0.18 | 0.17 |
-| EUFN | 0.60 | 0.24 | 0.54 | −0.01 | 0.15 |
-| IVV | −0.26 | −0.57 | −0.14 | −0.74 | 0.66 |
+| IEUR | 0.12 | −0.12 | 0.04 | 0.12 | 0.28 |
+| FEZ | 0.01 | −0.17 | −0.12 | 0.23 | 0.17 |
+| EUFN | 0.60 | −0.04 | 0.54 | 0.11 | 0.15 |
+| IVV | −0.26 | 0.30 | −0.14 | 0.28 | 0.66 |
 
-**The short version: technical indicators do not beat the market here.** On the US benchmark both networks lose money while buy-and-hold earns a Sharpe of 0.66, and on IEUR and FEZ the best runs only match buy-and-hold.
+**The short version: technical indicators do not beat the market here.** On the US benchmark buy-and-hold earns a Sharpe of 0.66 and the best network reaches 0.30. On IEUR nothing comes close to buy-and-hold, and on FEZ only the top-10 LSTM edges past it (0.23 against 0.17), a gap that is gone at 2 bps of trading cost.
 
-EUFN is the one exception, with the MLP at 0.60 (0.54 on the top-10 features) against 0.15 for buy-and-hold. We do not read this as an edge. Its hit rate is barely above 50%, so the profit comes from a handful of large moves in a sector with deep drawdowns. A Sharpe of 0.60 over 12 years is a t-statistic of about 2.1, which does not survive a correction for the 16 runs in this table, and most of the edge disappears once trading costs are charged (below).
+EUFN is the one exception, with the MLP at 0.60 (0.54 on the top-10 features) against 0.15 for buy-and-hold. We do not read this as an edge. Its hit rate is barely above 50%, and 59% of its log return comes from just ten days, most of them in the March 2020 crash and the April 2025 tariff selloff. A Sharpe of 0.60 over 12 years is a t-statistic of about 2.1, which does not survive a correction for the 16 runs in this table, and most of the edge disappears once trading costs are charged (below).
 
 ### Transaction costs
 
-The MLPs change position about 90 times a year, so trading costs matter. [`scripts/cost_sensitivity.py`](scripts/cost_sensitivity.py) re-scores every run with a one-way cost per unit traded, where a long-to-short flip trades two units. For the three EUFN runs that beat buy-and-hold before costs:
+The networks change position 25 to 107 times a year, so trading costs matter. [`scripts/cost_sensitivity.py`](scripts/cost_sensitivity.py) re-scores every run with a one-way cost per unit traded, where a long-to-short flip trades two units. For the three runs that beat buy-and-hold before costs:
 
-| Run | Position changes per year | 0 bps | 2 bps | 5 bps | Sharpe reaches zero at |
-|:---|---:|---:|---:|---:|---:|
-| EUFN MLP | 91 | 0.60 | 0.43 | 0.19 | 7.5 bps |
-| EUFN MLP top-10 | 87 | 0.54 | 0.38 | 0.15 | 7.1 bps |
-| EUFN LSTM | 22 | 0.24 | 0.20 | 0.14 | 12.4 bps |
-| Buy & hold | | 0.15 | 0.15 | 0.15 | |
+| Run | Position changes per year | 0 bps | 2 bps | 5 bps | Sharpe reaches zero at | Buy & hold |
+|:---|---:|---:|---:|---:|---:|---:|
+| EUFN MLP | 91 | 0.60 | 0.43 | 0.19 | 7.5 bps | 0.15 |
+| EUFN MLP top-10 | 87 | 0.54 | 0.38 | 0.15 | 7.1 bps | 0.15 |
+| FEZ LSTM top-10 | 82 | 0.23 | 0.06 | −0.17 | 2.8 bps | 0.17 |
 
-At 5 bps per trade the EUFN MLP is level with buy-and-hold, and that is before any cost of holding the short side. The table for all 16 runs is in `reports/results/cost_sensitivity.csv`.
+At 2 bps per trade the FEZ LSTM falls below buy-and-hold, and at 5 bps the EUFN MLP is level with it, before any cost of holding the short side. The table for all 16 runs is in `reports/results/cost_sensitivity.csv`.
 
 Per-fold metrics and equity curves are in the modeling report.
 
@@ -236,7 +235,7 @@ Raw prices are cached as parquet under `data/raw/` and are not committed. IEUR h
 > [!NOTE]
 > What the results above can and cannot tell you.
 
-- **Same-day label.** Following the paper, Γ(t) is predicted from same-day indicators, so the Random Forest accuracy in the statistical report (76 to 81%) measures contemporaneous fit rather than forecasting skill.
+- **Same-day label.** Following the paper, Γ(t) is predicted from same-day indicators, so the Random Forest accuracy in the statistical report (76 to 81%) measures contemporaneous fit rather than forecasting skill. The MLP is trained on the same label but its signal trades the next day's return, so a next-day target would match training to trading.
 - **Simple cost model.** Trading costs are a flat charge per unit traded (see [Transaction costs](#transaction-costs)). Borrowing costs for the short side and market impact are not modelled.
 - **One seed per model.** Each network is trained with a single fixed seed, so how much these Sharpe ratios vary between training runs is unknown.
 
