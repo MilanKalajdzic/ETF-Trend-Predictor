@@ -205,7 +205,7 @@ window.Quarto = {
 </section>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">2. Setup</h2>
-<div id="c6687a43" class="cell" data-execution_count="1">
+<div id="b23990d7" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
@@ -231,7 +231,7 @@ window.Quarto = {
 </section>
 <section id="raw-data" class="level2">
 <h2 class="anchored" data-anchor-id="raw-data">3. Raw Data</h2>
-<div id="e364c9e2" class="cell" data-execution_count="2">
+<div id="6cbfefc3" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>loader <span class="op">=</span> YahooFinanceLoader(tickers<span class="op">=</span>TICKERS, start<span class="op">=</span>START, end<span class="op">=</span>END)</span>
@@ -250,7 +250,7 @@ IVV: 4106 rows, 2010-01-04 → 2026-04-30</code></pre>
 <p>Note: IEUR only has data from 2014-06-12 — this is a Yahoo Finance data availability limitation, not a pipeline issue.</p>
 <section id="open-price-summary-statistics" class="level3">
 <h3 class="anchored" data-anchor-id="open-price-summary-statistics">3.1 Open Price Summary Statistics</h3>
-<div id="53b2f201" class="cell" data-execution_count="3">
+<div id="f0aa1490" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -332,7 +332,7 @@ IVV: 4106 rows, 2010-01-04 → 2026-04-30</code></pre>
 </section>
 <section id="normalised-open-price-over-time" class="level3">
 <h3 class="anchored" data-anchor-id="normalised-open-price-over-time">3.2 Normalised Open Price Over Time</h3>
-<div id="78210dae" class="cell" data-execution_count="4">
+<div id="5fe0ae06" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>viz <span class="op">=</span> EDAVisualizer()</span>
@@ -351,7 +351,7 @@ IVV: 4106 rows, 2010-01-04 → 2026-04-30</code></pre>
 </section>
 <section id="sector-exposure" class="level3">
 <h3 class="anchored" data-anchor-id="sector-exposure">3.3 Sector Exposure</h3>
-<div id="e2f3c9d1" class="cell" data-execution_count="5">
+<div id="46444910" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> viz.plot_sector_exposure()</span>
@@ -371,7 +371,7 @@ IVV: 4106 rows, 2010-01-04 → 2026-04-30</code></pre>
 </section>
 <section id="pipeline" class="level2">
 <h2 class="anchored" data-anchor-id="pipeline">4. Pipeline</h2>
-<div id="406dba36" class="cell" data-execution_count="6">
+<div id="937ec878" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pipeline <span class="op">=</span> DataPipeline(</span>
@@ -408,28 +408,28 @@ IVV: 4106 rows, 2010-01-04 → 2026-04-30</code></pre>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">IEUR</th>
 <td>2735</td>
-<td>253</td>
+<td>252</td>
 <td>53.35</td>
 <td>46.65</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">FEZ</th>
 <td>3852</td>
-<td>253</td>
+<td>252</td>
 <td>52.47</td>
 <td>47.53</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">EUFN</th>
 <td>3831</td>
-<td>252</td>
+<td>251</td>
 <td>51.66</td>
 <td>48.34</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">IVV</th>
 <td>3852</td>
-<td>253</td>
+<td>252</td>
 <td>55.74</td>
 <td>44.26</td>
 </tr>
@@ -443,6 +443,7 @@ IVV: 4106 rows, 2010-01-04 → 2026-04-30</code></pre>
 <h3 class="anchored" data-anchor-id="technical-indicators">4.1 Technical Indicators</h3>
 <p>The Pandas TA library (v0.4.x) expands the 6 base OHLCV features to <strong>~250 daily features</strong> across 10 categories. Sparse columns with more than 95% NaN values (e.g.&nbsp;ZIGZAG) are automatically removed before cleaning.</p>
 <p><strong>Look-ahead check.</strong> Every indicator is tested for causality by recomputing it on data truncated at day t and checking that none of its values up to day t change. With default settings, five pandas-ta indicators fail this test and are dropped: DPO (centred, shifts the close backwards), the Ichimoku chikou span <code>ICS_26</code> (the close 26 days in the future), the <code>TOS_STDEVALL</code> regression bands (fitted on the whole sample), <code>VHM</code> (normalised with future data) and <code>ZIGZAG</code> (pivots confirmed only by later prices). Ichimoku’s forward span projections, dated after the last trading day, are also discarded. The check runs in the unit tests, so a library upgrade that introduces a new look-ahead indicator fails the build.</p>
+<p>The raw <code>Adj Close</code> column is excluded from the features as well: Yahoo back-adjusts it with dividends paid after each day, so its historical values are revised whenever a new dividend arrives. Indicators are computed on the unadjusted <code>Close</code>.</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -498,7 +499,7 @@ IVV: 4106 rows, 2010-01-04 → 2026-04-30</code></pre>
 <h3 class="anchored" data-anchor-id="classification-target-γt">4.2 Classification Target Γ(t)</h3>
 <p>Following the paper (Section 2.4):</p>
 <p><span class="math display">\[\Gamma(t) = \begin{cases} +1 &amp; \text{if } \text{Open}(t) - \text{Open}(t-1) &gt; 0 \\ -1 &amp; \text{otherwise} \end{cases}\]</span></p>
-<div id="c43c59fb" class="cell" data-execution_count="7">
+<div id="a1ef187b" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> viz.plot_cumulative_gamma(datasets)</span>
@@ -515,7 +516,7 @@ IVV: 4106 rows, 2010-01-04 → 2026-04-30</code></pre>
 </section>
 <section id="class-balance" class="level3">
 <h3 class="anchored" data-anchor-id="class-balance">4.3 Class Balance</h3>
-<div id="55b59abc" class="cell" data-execution_count="8">
+<div id="88ae4c0b" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> viz.plot_class_balance(datasets)</span>
@@ -548,7 +549,7 @@ IVV: 4106 rows, 2010-01-04 → 2026-04-30</code></pre>
 <li><strong>Sparse column removal</strong> — columns with &gt;95% NaN (e.g.&nbsp;ZIGZAG indicator) are dropped entirely before row-level cleaning.</li>
 <li><strong>Forward-fill</strong> — remaining NaN values from indicator warm-up periods are forward-filled, then any residual NaN rows are dropped.</li>
 </ol>
-<div id="44c1f241" class="cell" data-execution_count="9">
+<div id="1cd55905" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ticker, df <span class="kw">in</span> datasets.items():</span>
@@ -567,7 +568,7 @@ IVV: 3852 rows remaining, 0 NaN values</code></pre>
 </section>
 <section id="feature-correlation-selected-indicators" class="level2">
 <h2 class="anchored" data-anchor-id="feature-correlation-selected-indicators">6. Feature Correlation (Selected Indicators)</h2>
-<div id="2cf86448" class="cell" data-execution_count="10">
+<div id="8d6f7eef" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> viz.plot_correlation_heatmap(</span>
@@ -596,7 +597,7 @@ IVV: 3852 rows remaining, 0 NaN values</code></pre>
 <li><strong>Causality:</strong> every feature value at day t uses only data up to day t, so the frame can be split into walk-forward folds as is</li>
 <li><strong>Note:</strong> IEUR has fewer rows (~2400) than FEZ/EUFN/IVV (~3500) due to data availability starting June 2014</li>
 </ul>
-<div id="c5530f17" class="cell" data-execution_count="11">
+<div id="5446cdf7" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify handoff contract</span></span>
@@ -609,10 +610,10 @@ IVV: 3852 rows remaining, 0 NaN values</code></pre>
 <span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>ticker<span class="sc">}</span><span class="ss"> ✓  shape=</span><span class="sc">{</span>df<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>IEUR ✓  shape=(2735, 254)
-FEZ ✓  shape=(3852, 254)
-EUFN ✓  shape=(3831, 253)
-IVV ✓  shape=(3852, 254)</code></pre>
+<pre><code>IEUR ✓  shape=(2735, 253)
+FEZ ✓  shape=(3852, 253)
+EUFN ✓  shape=(3831, 252)
+IVV ✓  shape=(3852, 253)</code></pre>
 </div>
 </div>
 <hr>

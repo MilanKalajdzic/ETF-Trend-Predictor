@@ -2353,7 +2353,7 @@ window.Quarto = {
 </section>
 <section id="summary-table" class="level2">
 <h2 class="anchored" data-anchor-id="summary-table">Summary Table</h2>
-<div id="e40263fe" class="cell" data-execution_count="2">
+<div id="a92209ee" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div>
 
@@ -2377,50 +2377,50 @@ window.Quarto = {
 <tr class="odd">
 <th data-quarto-table-cell-role="th">0</th>
 <td>IEUR</td>
-<td>253</td>
-<td>3202</td>
-<td>0.782450</td>
+<td>252</td>
+<td>3165</td>
+<td>0.762340</td>
 <td>0.533455</td>
 <td>0.466545</td>
-<td>0.083373</td>
-<td>0.089672</td>
-<td>0.100432</td>
+<td>0.827303</td>
+<td>7.474807</td>
+<td>9.578057</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">1</th>
 <td>FEZ</td>
-<td>253</td>
-<td>3509</td>
-<td>0.793774</td>
+<td>252</td>
+<td>3481</td>
+<td>0.775616</td>
 <td>0.524663</td>
 <td>0.475337</td>
-<td>0.043333</td>
-<td>0.101080</td>
-<td>0.115778</td>
+<td>0.815549</td>
+<td>8.629158</td>
+<td>10.957700</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">2</th>
 <td>EUFN</td>
-<td>252</td>
+<td>251</td>
 <td>3719</td>
-<td>0.794003</td>
+<td>0.786180</td>
 <td>0.516575</td>
 <td>0.483425</td>
-<td>0.050126</td>
-<td>0.271020</td>
-<td>0.318401</td>
+<td>0.887924</td>
+<td>7.184657</td>
+<td>9.504467</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">3</th>
 <td>IVV</td>
-<td>253</td>
-<td>1622</td>
-<td>0.814527</td>
+<td>252</td>
+<td>1592</td>
+<td>0.811933</td>
 <td>0.557373</td>
 <td>0.442627</td>
-<td>0.000227</td>
-<td>0.133513</td>
-<td>0.143163</td>
+<td>0.998044</td>
+<td>146.810872</td>
+<td>171.457864</td>
 </tr>
 </tbody>
 </table>
@@ -2437,7 +2437,7 @@ window.Quarto = {
 <section id="correlation-redundancy" class="level2">
 <h2 class="anchored" data-anchor-id="correlation-redundancy">Correlation Redundancy</h2>
 <p>A major finding of the analysis is the very high redundancy in the feature space. For each ETF, we counted the number of feature pairs with absolute correlation above 0.95. The totals are very large, indicating that many technical indicators contain nearly identical information.</p>
-<div id="b4553ac0" class="cell" data-execution_count="3">
+<div id="c0758794" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div>
 
@@ -2454,12 +2454,12 @@ window.Quarto = {
 <tr class="odd">
 <th data-quarto-table-cell-role="th">0</th>
 <td>IEUR</td>
-<td>3202</td>
+<td>3165</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">1</th>
 <td>FEZ</td>
-<td>3509</td>
+<td>3481</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">2</th>
@@ -2469,7 +2469,7 @@ window.Quarto = {
 <tr class="even">
 <th data-quarto-table-cell-role="th">3</th>
 <td>IVV</td>
-<td>1622</td>
+<td>1592</td>
 </tr>
 </tbody>
 </table>
@@ -2482,7 +2482,7 @@ window.Quarto = {
 <section id="feature-importance" class="level2">
 <h2 class="anchored" data-anchor-id="feature-importance">Feature Importance</h2>
 <p>To assess predictive usefulness, we fitted a Random Forest classifier for each ETF and extracted feature-importance scores. The most important indicators are relatively consistent across ETFs, especially the <code>SMC*</code> family, along with indicators such as <code>CRSI_3_2_100</code>, <code>BBP_5_2.0_2.0</code>, <code>THERMO_20_2_0.5</code>, <code>CFO_9</code>, <code>BOP</code>, and short-horizon return features.</p>
-<div id="5a2d72c8" class="cell" data-execution_count="4">
+<div id="58d0db9e" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div>
 
@@ -2501,121 +2501,121 @@ window.Quarto = {
 <th data-quarto-table-cell-role="th">0</th>
 <td>IEUR</td>
 <td>SMCtp_14_50_20_5</td>
-<td>0.043880</td>
+<td>0.043442</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">1</th>
 <td>IEUR</td>
-<td>SMCbp_14_50_20_5</td>
-<td>0.039274</td>
+<td>SMCbi_14_50_20_5</td>
+<td>0.034529</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">2</th>
 <td>IEUR</td>
 <td>CRSI_3_2_100</td>
-<td>0.037163</td>
+<td>0.033936</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">3</th>
 <td>IEUR</td>
-<td>SMCbi_14_50_20_5</td>
-<td>0.037096</td>
+<td>SMCbp_14_50_20_5</td>
+<td>0.032116</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">4</th>
 <td>IEUR</td>
 <td>BBP_5_2.0_2.0</td>
-<td>0.028733</td>
+<td>0.027286</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">5</th>
 <td>FEZ</td>
 <td>SMCtp_14_50_20_5</td>
-<td>0.049066</td>
+<td>0.047201</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">6</th>
 <td>FEZ</td>
-<td>SMCbi_14_50_20_5</td>
-<td>0.043803</td>
+<td>SMCbp_14_50_20_5</td>
+<td>0.038170</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">7</th>
 <td>FEZ</td>
-<td>SMCbp_14_50_20_5</td>
-<td>0.042301</td>
+<td>SMCbi_14_50_20_5</td>
+<td>0.034445</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">8</th>
 <td>FEZ</td>
 <td>CRSI_3_2_100</td>
-<td>0.030251</td>
+<td>0.032105</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">9</th>
 <td>FEZ</td>
-<td>BBP_5_2.0_2.0</td>
-<td>0.025177</td>
+<td>SMCti_14_50_20_5</td>
+<td>0.026371</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">10</th>
 <td>EUFN</td>
-<td>SMCtp_14_50_20_5</td>
-<td>0.051788</td>
+<td>SMCbp_14_50_20_5</td>
+<td>0.046916</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">11</th>
 <td>EUFN</td>
-<td>SMCbp_14_50_20_5</td>
-<td>0.050567</td>
+<td>SMCtp_14_50_20_5</td>
+<td>0.041587</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">12</th>
 <td>EUFN</td>
 <td>CRSI_3_2_100</td>
-<td>0.038591</td>
+<td>0.036456</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">13</th>
 <td>EUFN</td>
-<td>BBP_5_2.0_2.0</td>
-<td>0.037471</td>
+<td>SMCbi_14_50_20_5</td>
+<td>0.032868</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">14</th>
 <td>EUFN</td>
-<td>SMCbi_14_50_20_5</td>
-<td>0.029268</td>
+<td>BBP_5_2.0_2.0</td>
+<td>0.027102</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">15</th>
 <td>IVV</td>
 <td>SMCtp_14_50_20_5</td>
-<td>0.061649</td>
+<td>0.061126</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">16</th>
 <td>IVV</td>
 <td>SMCbp_14_50_20_5</td>
-<td>0.055157</td>
+<td>0.051128</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">17</th>
 <td>IVV</td>
-<td>Open</td>
-<td>0.027565</td>
+<td>SMCbf_14_50_20_5</td>
+<td>0.026311</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">18</th>
 <td>IVV</td>
-<td>SMCbf_14_50_20_5</td>
-<td>0.025421</td>
+<td>Open</td>
+<td>0.025305</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">19</th>
 <td>IVV</td>
-<td>SMCbi_14_50_20_5</td>
-<td>0.023142</td>
+<td>BBP_5_2.0_2.0</td>
+<td>0.023905</td>
 </tr>
 </tbody>
 </table>
@@ -2628,7 +2628,7 @@ window.Quarto = {
 <section id="time-series-diagnostics-and-arima-baseline" class="level2">
 <h2 class="anchored" data-anchor-id="time-series-diagnostics-and-arima-baseline">Time-Series Diagnostics and ARIMA Baseline</h2>
 <p>As a univariate time-series benchmark, we applied an ADF stationarity test and an ARIMA(1,1,1) model to the <code>Close</code> price series for each ETF.</p>
-<div id="ad94cdeb" class="cell" data-execution_count="5">
+<div id="f4363e93" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div>
 
@@ -2654,12 +2654,12 @@ window.Quarto = {
 <th data-quarto-table-cell-role="th">0</th>
 <td>IEUR</td>
 <td>Close</td>
-<td>-2.648544</td>
-<td>0.083373</td>
+<td>-0.771669</td>
+<td>0.827303</td>
 <td>9</td>
 <td>2725</td>
-<td>0.089672</td>
-<td>0.100432</td>
+<td>7.474807</td>
+<td>9.578057</td>
 <td>2188</td>
 <td>547</td>
 </tr>
@@ -2667,12 +2667,12 @@ window.Quarto = {
 <th data-quarto-table-cell-role="th">1</th>
 <td>FEZ</td>
 <td>Close</td>
-<td>-2.917652</td>
-<td>0.043333</td>
-<td>27</td>
-<td>3824</td>
-<td>0.101080</td>
-<td>0.115778</td>
+<td>-0.812075</td>
+<td>0.815549</td>
+<td>3</td>
+<td>3848</td>
+<td>8.629158</td>
+<td>10.957700</td>
 <td>3081</td>
 <td>771</td>
 </tr>
@@ -2680,12 +2680,12 @@ window.Quarto = {
 <th data-quarto-table-cell-role="th">2</th>
 <td>EUFN</td>
 <td>Close</td>
-<td>-2.860592</td>
-<td>0.050126</td>
+<td>-0.520646</td>
+<td>0.887924</td>
 <td>3</td>
 <td>3827</td>
-<td>0.271020</td>
-<td>0.318401</td>
+<td>7.184657</td>
+<td>9.504467</td>
 <td>3064</td>
 <td>767</td>
 </tr>
@@ -2693,12 +2693,12 @@ window.Quarto = {
 <th data-quarto-table-cell-role="th">3</th>
 <td>IVV</td>
 <td>Close</td>
-<td>-4.464987</td>
-<td>0.000227</td>
-<td>27</td>
-<td>3824</td>
-<td>0.133513</td>
-<td>0.143163</td>
+<td>1.666539</td>
+<td>0.998044</td>
+<td>26</td>
+<td>3825</td>
+<td>146.810872</td>
+<td>171.457864</td>
 <td>3081</td>
 <td>771</td>
 </tr>
