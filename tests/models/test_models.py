@@ -52,7 +52,7 @@ def test_mlp_fits_and_predicts_signal_shape() -> None:
     assert set(np.unique(sig)).issubset({-1, 1})
 
 
-def test_lstm_fits_and_predicts_close() -> None:
+def test_lstm_fits_and_predicts_return() -> None:
     df, price = _make_dataset(n=200)
     X = df.drop(columns=["Gamma"])
 
@@ -61,9 +61,30 @@ def test_lstm_fits_and_predicts_close() -> None:
     )
     model.fit(X, price)
 
-    pred = model.predict_close(X.tail(30), history=X.iloc[-40:-30])
+    pred = model.predict_return(X.tail(30), history=X.iloc[-40:-30])
     assert len(pred) == 30
     assert pred.notna().all()
+
+
+def test_lstm_not_stuck_short_at_new_highs() -> None:
+    # A steady uptrend with uninformative features: once the test period
+    # trades above the training range, a price-level target would push
+    # every prediction below the current price (all short). A return
+    # target should follow the positive drift instead.
+    rng = np.random.default_rng(1)
+    n, n_train = 400, 300
+    dates = pd.date_range("2018-01-01", periods=n, freq="B")
+    X = pd.DataFrame(rng.uniform(size=(n, 4)), index=dates)
+    returns = 0.002 + rng.normal(scale=0.002, size=n)
+    price = pd.Series(100 * np.cumprod(1 + returns), index=dates)
+    assert price.iloc[n_train:].min() > price.iloc[:n_train].max() * 0.95
+
+    model = LSTMValueModel(sequence_length=10, epochs=5, hidden_size=16)
+    model.fit(X.iloc[:n_train], price.iloc[:n_train])
+    signal = model.predict_signal(
+        X.iloc[n_train:], history=X.iloc[n_train - 10:n_train]
+    )
+    assert (signal == 1).mean() > 0.8
 
 
 def test_walk_forward_mlp_runs() -> None:

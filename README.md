@@ -38,7 +38,7 @@
 | **Data** | Daily OHLCV from Yahoo Finance, 2010 to April 2026 |
 | **Features** | ~250 look-ahead-free technical indicators across 10 pandas-ta categories |
 | **Target** | Γ(t) = +1 if Open(t) > Open(t−1), else −1 |
-| **Models** | MLP signal classifier and LSTM next-close regressor (PyTorch) |
+| **Models** | MLP signal classifier and LSTM next-day return regressor (PyTorch) |
 | **Validation** | Expanding-window walk-forward, 16 to 25 six-month folds per ticker, benchmarked against buy-and-hold |
 | **Baselines** | Random Forest feature importance, ADF stationarity tests, ARIMA(1,1,1) |
 | **Reproducibility** | One Docker image, Makefile automation, 59 unit tests, Sphinx API docs |
@@ -92,7 +92,7 @@ flowchart LR
 |---|---|---|
 | **1. Data** | `etf_predictor.data` | Downloads and caches prices, computes ~250 indicators and drops any that use future prices, builds the Γ(t) target, scales features to [0, 1] with an expanding window, drops sparse columns and forward-fills warm-up gaps |
 | **2. Analysis** | `etf_predictor.analysis` | Low-variance and correlation redundancy checks, Random Forest feature importance, ADF stationarity tests, ARIMA(1,1,1) baseline |
-| **3. Modeling** | `etf_predictor.models` | MLP signal and LSTM next-close models trained in an expanding window, long/short equity curves against buy-and-hold, top-10 feature ablation |
+| **3. Modeling** | `etf_predictor.models` | MLP signal and LSTM return models trained in an expanding window, long/short equity curves against buy-and-hold, top-10 feature ablation |
 
 ---
 
