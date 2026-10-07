@@ -111,7 +111,11 @@ def build_comparison(
 
     for res in results:
         ret = res.predictions.loc[common_index, "strategy_return"]
-        curves[res.model_name] = equity_curve(ret)
+        # strategy_return at day t is earned over t -> t+1, while the
+        # buy-and-hold curve at day t only includes returns up to t.
+        # Shift by one day so every curve starts at 1.0 and both are
+        # marked to market on the same day.
+        curves[res.model_name] = equity_curve(ret.shift(1))
         row = {"model": res.model_name, **summary_metrics(ret)}
         metric_rows.append(row)
 
