@@ -2451,7 +2451,7 @@ window.Quarto = {
 </section>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">2. Setup</h2>
-<div id="8a04bae7" class="cell" data-execution_count="1">
+<div id="b2bb13c3" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
@@ -2477,7 +2477,7 @@ window.Quarto = {
 </section>
 <section id="raw-data" class="level2">
 <h2 class="anchored" data-anchor-id="raw-data">3. Raw Data</h2>
-<div id="57b19b00" class="cell" data-execution_count="2">
+<div id="75270932" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>loader <span class="op">=</span> YahooFinanceLoader(tickers<span class="op">=</span>TICKERS, start<span class="op">=</span>START, end<span class="op">=</span>END)</span>
@@ -2496,7 +2496,7 @@ IVV: 4106 rows, 2010-01-04 → 2026-04-30</code></pre>
 <p>Note: IEUR only has data from 2014-06-12 — this is a Yahoo Finance data availability limitation, not a pipeline issue.</p>
 <section id="open-price-summary-statistics" class="level3">
 <h3 class="anchored" data-anchor-id="open-price-summary-statistics">3.1 Open Price Summary Statistics</h3>
-<div id="066a6e7a" class="cell" data-execution_count="3">
+<div id="31686796" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -2578,7 +2578,7 @@ IVV: 4106 rows, 2010-01-04 → 2026-04-30</code></pre>
 </section>
 <section id="normalised-open-price-over-time" class="level3">
 <h3 class="anchored" data-anchor-id="normalised-open-price-over-time">3.2 Normalised Open Price Over Time</h3>
-<div id="643dcc86" class="cell" data-execution_count="4">
+<div id="8d370410" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>viz <span class="op">=</span> EDAVisualizer()</span>
@@ -2597,7 +2597,7 @@ IVV: 4106 rows, 2010-01-04 → 2026-04-30</code></pre>
 </section>
 <section id="sector-exposure" class="level3">
 <h3 class="anchored" data-anchor-id="sector-exposure">3.3 Sector Exposure</h3>
-<div id="a33b99f3" class="cell" data-execution_count="5">
+<div id="c97ccff3" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> viz.plot_sector_exposure()</span>
@@ -2617,7 +2617,7 @@ IVV: 4106 rows, 2010-01-04 → 2026-04-30</code></pre>
 </section>
 <section id="pipeline" class="level2">
 <h2 class="anchored" data-anchor-id="pipeline">4. Pipeline</h2>
-<div id="e3860ebe" class="cell" data-execution_count="6">
+<div id="72124cc6" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pipeline <span class="op">=</span> DataPipeline(</span>
@@ -2745,7 +2745,7 @@ IVV: 4106 rows, 2010-01-04 → 2026-04-30</code></pre>
 <h3 class="anchored" data-anchor-id="classification-target-γt">4.2 Classification Target Γ(t)</h3>
 <p>Following the paper (Section 2.4):</p>
 <p><span class="math display">\[\Gamma(t) = \begin{cases} +1 &amp; \text{if } \text{Open}(t) - \text{Open}(t-1) &gt; 0 \\ -1 &amp; \text{otherwise} \end{cases}\]</span></p>
-<div id="674ac8ad" class="cell" data-execution_count="7">
+<div id="e6d50c28" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> viz.plot_cumulative_gamma(datasets)</span>
@@ -2762,7 +2762,7 @@ IVV: 4106 rows, 2010-01-04 → 2026-04-30</code></pre>
 </section>
 <section id="class-balance" class="level3">
 <h3 class="anchored" data-anchor-id="class-balance">4.3 Class Balance</h3>
-<div id="1cb97c47" class="cell" data-execution_count="8">
+<div id="4f81da7e" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> viz.plot_class_balance(datasets)</span>
@@ -2795,7 +2795,7 @@ IVV: 4106 rows, 2010-01-04 → 2026-04-30</code></pre>
 <li><strong>Sparse column removal</strong> — columns with &gt;95% NaN (e.g. ZIGZAG indicator) are dropped entirely before row-level cleaning.</li>
 <li><strong>Forward-fill</strong> — remaining NaN values from indicator warm-up periods are forward-filled, then any residual NaN rows are dropped.</li>
 </ol>
-<div id="4a132a9a" class="cell" data-execution_count="9">
+<div id="be151dfd" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ticker, df <span class="kw">in</span> datasets.items():</span>
@@ -2814,7 +2814,7 @@ IVV: 3852 rows remaining, 0 NaN values</code></pre>
 </section>
 <section id="feature-correlation-selected-indicators" class="level2">
 <h2 class="anchored" data-anchor-id="feature-correlation-selected-indicators">6. Feature Correlation (Selected Indicators)</h2>
-<div id="4f692696" class="cell" data-execution_count="10">
+<div id="4d103b51" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> viz.plot_correlation_heatmap(</span>
@@ -2843,7 +2843,7 @@ IVV: 3852 rows remaining, 0 NaN values</code></pre>
 <li><strong>Causality:</strong> every feature value at day t uses only data up to day t, so the frame can be split into walk-forward folds as is</li>
 <li><strong>Note:</strong> IEUR has fewer rows (~2400) than FEZ/EUFN/IVV (~3500) due to data availability starting June 2014</li>
 </ul>
-<div id="8f97a19c" class="cell" data-execution_count="11">
+<div id="8e956023" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify handoff contract</span></span>
