@@ -7,6 +7,7 @@ format:
     toc-depth: 3
     code-fold: true
     theme: cosmo
+    embed-resources: true
     fig-width: 10
     fig-height: 5
 execute:
