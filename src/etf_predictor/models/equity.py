@@ -76,6 +76,38 @@ def summary_metrics(strategy_returns: pd.Series) -> dict[str, float]:
     }
 
 
+def apply_transaction_costs(
+    signal: pd.Series,
+    strategy_returns: pd.Series,
+    cost_bps: float,
+) -> pd.Series:
+    """Deduct a proportional transaction cost from strategy returns.
+
+    The cost is charged one way per unit of notional traded: entering
+    the first position trades one unit, and flipping from long to short
+    (or back) trades two.
+
+    Parameters
+    ----------
+    signal : pd.Series
+        Daily position in {+1, -1}, aligned with *strategy_returns*.
+    strategy_returns : pd.Series
+        Daily simple returns of the strategy before costs.
+    cost_bps : float
+        One-way cost in basis points per unit of notional traded.
+
+    Returns
+    -------
+    pd.Series
+        Strategy returns net of transaction costs.
+
+    """
+    position = signal.astype(float)
+    turnover = position.diff().abs()
+    turnover.iloc[0] = abs(position.iloc[0])
+    return strategy_returns - turnover * cost_bps / 1e4
+
+
 def build_comparison(
     results: Iterable[WalkForwardResult],
     close_unscaled: pd.Series,

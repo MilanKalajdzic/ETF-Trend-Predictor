@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white" alt="Python 3.12">
   <img src="https://img.shields.io/badge/PyTorch-CPU-EE4C2C?logo=pytorch&logoColor=white" alt="PyTorch">
   <img src="https://img.shields.io/badge/reports-Quarto-75AADB?logo=quarto&logoColor=white" alt="Quarto reports">
-  <img src="https://img.shields.io/badge/tests-58%20unit%20tests-0A9EDC?logo=pytest&logoColor=white" alt="58 unit tests">
+  <img src="https://img.shields.io/badge/tests-59%20unit%20tests-0A9EDC?logo=pytest&logoColor=white" alt="59 unit tests">
   <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff"></a>
 </p>
 
@@ -41,7 +41,7 @@
 | **Models** | MLP signal classifier and LSTM next-close regressor (PyTorch) |
 | **Validation** | Expanding-window walk-forward, 16 to 25 six-month folds per ticker, benchmarked against buy-and-hold |
 | **Baselines** | Random Forest feature importance, ADF stationarity tests, ARIMA(1,1,1) |
-| **Reproducibility** | One Docker image, Makefile automation, 58 unit tests, Sphinx API docs |
+| **Reproducibility** | One Docker image, Makefile automation, 59 unit tests, Sphinx API docs |
 
 ---
 
@@ -114,7 +114,20 @@ Out-of-sample walk-forward results, trading long/short on each model's daily sig
 
 **The short version: technical indicators do not beat the market here.** On the US benchmark both networks lose money while buy-and-hold earns a Sharpe of 0.66, and on IEUR and FEZ the best runs only match buy-and-hold.
 
-EUFN is the one exception, with the MLP at 0.60 (0.54 on the top-10 features) against 0.15 for buy-and-hold. We do not read this as an edge. Its hit rate is barely above 50%, so the profit comes from a handful of large moves in a sector with deep drawdowns. A Sharpe of 0.60 over 12 years is a t-statistic of about 2.1, which does not survive a correction for the 16 runs in this table, and the strategy trades daily with no costs deducted.
+EUFN is the one exception, with the MLP at 0.60 (0.54 on the top-10 features) against 0.15 for buy-and-hold. We do not read this as an edge. Its hit rate is barely above 50%, so the profit comes from a handful of large moves in a sector with deep drawdowns. A Sharpe of 0.60 over 12 years is a t-statistic of about 2.1, which does not survive a correction for the 16 runs in this table, and most of the edge disappears once trading costs are charged (below).
+
+### Transaction costs
+
+The MLPs change position about 90 times a year, so trading costs matter. [`scripts/cost_sensitivity.py`](scripts/cost_sensitivity.py) re-scores every run with a one-way cost per unit traded, where a long-to-short flip trades two units. For the three EUFN runs that beat buy-and-hold before costs:
+
+| Run | Position changes per year | 0 bps | 2 bps | 5 bps | Sharpe reaches zero at |
+|:---|---:|---:|---:|---:|---:|
+| EUFN MLP | 91 | 0.60 | 0.43 | 0.19 | 7.5 bps |
+| EUFN MLP top-10 | 87 | 0.54 | 0.38 | 0.15 | 7.1 bps |
+| EUFN LSTM | 22 | 0.24 | 0.20 | 0.14 | 12.4 bps |
+| Buy & hold | | 0.15 | 0.15 | 0.15 | |
+
+At 5 bps per trade the EUFN MLP is level with buy-and-hold, and that is before any cost of holding the short side. The table for all 16 runs is in `reports/results/cost_sensitivity.csv`.
 
 Per-fold metrics and equity curves are in the modeling report.
 
@@ -160,7 +173,7 @@ Inside the container:
 | `make data` | Download and process all ETF data |
 | `make eda` | Generate EDA figures to `reports/figures/` |
 | `make analysis` | Run the statistical analysis |
-| `make modeling` | Train MLP and LSTM with walk-forward validation |
+| `make modeling` | Train MLP and LSTM with walk-forward validation, then score them net of trading costs |
 | `make report` | Full pipeline, render all reports, publish to `/output` |
 | `make render` | Re-render the Quarto reports from existing results (fast) |
 | `make publish` | Copy `reports/*.html` to `/output` |
@@ -180,7 +193,7 @@ Inside the container:
 │   ├── analysis/      variance, correlation, feature importance, time series (ADF, ARIMA)
 │   └── models/        MLP signal, LSTM value, walk-forward validator, equity curves
 ├── tests/             data/, analysis/, models/
-├── scripts/           generate_eda.py, run_analysis.py, run_modeling.py
+├── scripts/           generate_eda.py, run_analysis.py, run_modeling.py, cost_sensitivity.py
 ├── reports/           Quarto sources (.qmd) and results/*.csv
 ├── docs/source/       Sphinx configuration
 ├── assets/            social preview image and its HTML source
@@ -224,7 +237,7 @@ Raw prices are cached as parquet under `data/raw/` and are not committed. IEUR h
 > What the results above can and cannot tell you.
 
 - **Same-day label.** Following the paper, Γ(t) is predicted from same-day indicators, so the Random Forest accuracy in the statistical report (76 to 81%) measures contemporaneous fit rather than forecasting skill.
-- **No trading frictions.** Returns ignore transaction costs, spreads and shorting costs, which matter for a strategy that can flip position every day.
+- **Simple cost model.** Trading costs are a flat charge per unit traded (see [Transaction costs](#transaction-costs)). Borrowing costs for the short side and market impact are not modelled.
 - **One seed per model.** Each network is trained with a single fixed seed, so how much these Sharpe ratios vary between training runs is unknown.
 
 ---

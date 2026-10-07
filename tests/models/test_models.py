@@ -9,6 +9,7 @@ import pytest
 torch = pytest.importorskip("torch")
 
 from etf_predictor.models.equity import ( 
+    apply_transaction_costs,
     build_comparison,
     equity_curve,
     summary_metrics,
@@ -119,3 +120,18 @@ def test_equity_helpers_align_and_summarise() -> None:
     assert eq.iloc[0] > 0
     stats = summary_metrics(mlp_res.predictions["strategy_return"])
     assert "sharpe" in stats and "max_drawdown" in stats
+
+
+def test_transaction_costs_charge_turnover() -> None:
+    idx = pd.date_range("2020-01-01", periods=4, freq="B")
+    signal = pd.Series([1, 1, -1, -1], index=idx)
+    returns = pd.Series(0.01, index=idx)
+
+    net = apply_transaction_costs(signal, returns, cost_bps=10)
+
+    # Entry trades one unit, the long-to-short flip on day 3 trades two.
+    expected = [0.01 - 0.001, 0.01, 0.01 - 0.002, 0.01]
+    np.testing.assert_allclose(net.to_numpy(), expected)
+    pd.testing.assert_series_equal(
+        apply_transaction_costs(signal, returns, cost_bps=0), returns
+    )
