@@ -4,13 +4,18 @@ preprocessing.py
 Data normalisation and cleaning as described in Sagaceta-Mejía et al.
 (2024), Sections 2.5 and 2.6.
 
-Two classes are provided:
+Three classes are provided:
 
-- ``MinMaxScaler``  — per-column min-max normalisation fitted only on
-  training data to prevent target leakage.
-- ``DataCleaner``   — removes rows containing NaN values that arise
-  from the warm-up period of technical indicators (e.g. SMA requires
-  ``n`` prior rows before it can be computed).
+- ``MinMaxScaler``          per-column min-max normalisation, fitted
+  on a training split and applied to a test split.
+- ``ExpandingMinMaxScaler`` causal min-max normalisation: each value is
+  scaled with the min and max observed up to that day only, so a
+  dataset scaled once can be split into walk-forward folds without
+  leaking the future range of a feature into earlier rows. This is what
+  the data pipeline uses.
+- ``DataCleaner``           removes rows containing NaN values that
+  arise from the warm-up period of technical indicators (e.g. SMA
+  requires ``n`` prior rows before it can be computed).
 """
 
 from __future__ import annotations
@@ -152,6 +157,77 @@ class MinMaxScaler:
     def _feature_cols(self, df: pd.DataFrame) -> list[str]:
         """Return columns that should be scaled."""
         return [c for c in df.columns if c not in self.exclude_cols]
+
+
+class ExpandingMinMaxScaler:
+    """Causal (expanding-window) min-max normalisation to [0, 1].
+
+    Each value is scaled with statistics known on that day::
+
+        scaled_t = (x_t - min(x_1..x_t)) / (max(x_1..x_t) - min(x_1..x_t))
+
+    or, with ``window`` set, over the trailing ``window`` observations.
+    Unlike a full-sample min-max fit, the scaled value at day t never
+    depends on data after t, so the output can be split into
+    walk-forward folds without look-ahead leakage. Values stay in
+    [0, 1]; a column with no range so far (constant) maps to 0.0.
+
+    Parameters
+    ----------
+    window : int or None
+        ``None`` (default) for an expanding window over all history,
+        or a trailing window length in rows.
+    exclude_cols : list[str] or None
+        Columns to leave unscaled (e.g. the target column ``"Gamma"``).
+
+    Examples
+    --------
+    >>> scaler = ExpandingMinMaxScaler(exclude_cols=["Gamma"])
+    >>> df_scaled = scaler.transform(df)
+    """
+
+    def __init__(
+        self,
+        window: int | None = None,
+        exclude_cols: list[str] | None = None,
+    ) -> None:
+        if window is not None and window < 2:
+            raise ValueError(f"window must be >= 2 or None, got {window}")
+        self.window = window
+        self.exclude_cols = set(exclude_cols or [])
+
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Scale every non-excluded column using only past and current values.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Time-ordered DataFrame (oldest row first).
+
+        Returns
+        -------
+        pd.DataFrame
+            Scaled copy of *df* with the same index and columns. NaNs
+            stay NaN.
+        """
+        result = df.copy()
+        result = result.loc[:, ~result.columns.duplicated()]
+        cols = [c for c in result.columns if c not in self.exclude_cols]
+        x = result[cols].astype(float)
+
+        if self.window is None:
+            lo = x.cummin()
+            hi = x.cummax()
+        else:
+            lo = x.rolling(self.window, min_periods=1).min()
+            hi = x.rolling(self.window, min_periods=1).max()
+
+        denom = (hi - lo).replace(0, np.nan)
+        scaled = (x - lo) / denom
+        # No range yet (constant so far): 0.0 where the input is defined
+        scaled = scaled.mask(denom.isna() & x.notna(), 0.0)
+        result[cols] = scaled
+        return result
 
 
 class DataCleaner:
