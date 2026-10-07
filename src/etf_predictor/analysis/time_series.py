@@ -8,7 +8,11 @@ class TimeSeriesAnalyzer:
     """Run basic time-series diagnostics and ARIMA forecasting."""
 
     def __init__(self, series: pd.Series) -> None:
-        self.series = series.dropna().copy()
+        # Trading days have holiday gaps, so a date index has no frequency
+        # and statsmodels cannot extend it when forecasting. Index by
+        # trading-day position instead; observations stay evenly spaced in
+        # trading time.
+        self.series = series.dropna().reset_index(drop=True)
         self.model_fit = None
 
     def adf_test(self) -> dict[str, float]:
