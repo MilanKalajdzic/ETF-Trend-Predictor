@@ -1,6 +1,5 @@
-"""
-preprocessing.py
-----------------
+"""Normalise and clean the feature data.
+
 Data normalisation and cleaning as described in Sagaceta-Mejía et al.
 (2024), Sections 2.5 and 2.6.
 
@@ -21,7 +20,6 @@ Three classes are provided:
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -53,24 +51,25 @@ class MinMaxScaler:
     >>> scaler.fit(X_train)
     >>> X_train_scaled = scaler.transform(X_train)
     >>> X_test_scaled  = scaler.transform(X_test)
+
     """
 
     def __init__(
         self,
         feature_range: tuple[float, float] = (0.0, 1.0),
-        exclude_cols: Optional[list[str]] = None,
+        exclude_cols: list[str] | None = None,
     ) -> None:
         self.feature_range = feature_range
         self.exclude_cols = set(exclude_cols or [])
-        self._min: Optional[pd.Series] = None
-        self._max: Optional[pd.Series] = None
+        self._min: pd.Series | None = None
+        self._max: pd.Series | None = None
         self._fitted = False
 
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
 
-    def fit(self, df: pd.DataFrame) -> "MinMaxScaler":
+    def fit(self, df: pd.DataFrame) -> MinMaxScaler:
         """Compute per-column min and max from *df*.
 
         Parameters
@@ -83,6 +82,7 @@ class MinMaxScaler:
         -------
         MinMaxScaler
             Returns ``self`` for method chaining.
+
         """
         df = df.loc[:, ~df.columns.duplicated()]
         cols = self._feature_cols(df)
@@ -109,6 +109,7 @@ class MinMaxScaler:
         ------
         RuntimeError
             If ``fit()`` has not been called yet.
+
         """
         if not self._fitted:
             raise RuntimeError("Call fit() before transform().")
@@ -136,7 +137,7 @@ class MinMaxScaler:
         return result
 
     def fit_transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Convenience wrapper: fit then transform in one step.
+        """Fit on *df* and transform it in one step.
 
         Parameters
         ----------
@@ -147,6 +148,7 @@ class MinMaxScaler:
         -------
         pd.DataFrame
             Scaled training data.
+
         """
         return self.fit(df).transform(df)
 
@@ -184,6 +186,7 @@ class ExpandingMinMaxScaler:
     --------
     >>> scaler = ExpandingMinMaxScaler(exclude_cols=["Gamma"])
     >>> df_scaled = scaler.transform(df)
+
     """
 
     def __init__(
@@ -209,6 +212,7 @@ class ExpandingMinMaxScaler:
         pd.DataFrame
             Scaled copy of *df* with the same index and columns. NaNs
             stay NaN.
+
         """
         result = df.copy()
         result = result.loc[:, ~result.columns.duplicated()]
@@ -254,12 +258,13 @@ class DataCleaner:
     --------
     >>> cleaner = DataCleaner(strategy="drop_rows")
     >>> df_clean = cleaner.clean(df_with_indicators)
+
     """
 
     def __init__(
         self,
         strategy: str = "drop_rows",
-        exclude_cols: Optional[list[str]] = None,
+        exclude_cols: list[str] | None = None,
     ) -> None:
         valid = {"drop_rows", "fill_forward"}
         if strategy not in valid:
@@ -274,11 +279,24 @@ class DataCleaner:
     # ------------------------------------------------------------------
 
     def clean(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Drop near-empty columns, then fill or drop rows with missing values.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Feature frame to clean.
+
+        Returns
+        -------
+        pd.DataFrame
+            Cleaned copy of *df*.
+
+        """
         original_len = len(df)
         feature_cols = [c for c in df.columns if c not in self.exclude_cols]
 
-        # Drop columns that are more than 50% NaN — these are sparse
-        # indicators like ZIGZAG that would eliminate all rows
+        # Drop columns that are more than 95% NaN: sparse indicators
+        # that would otherwise eliminate every row
         thresh = int(len(df) * 0.95)
         sparse_cols = [
             c for c in feature_cols
@@ -288,7 +306,7 @@ class DataCleaner:
             df = df.drop(columns=sparse_cols)
             feature_cols = [c for c in feature_cols if c not in sparse_cols]
             logger.info(
-                "Dropped %d sparse columns (>50%% NaN): %s",
+                "Dropped %d sparse columns (>95%% NaN): %s",
                 len(sparse_cols),
                 sparse_cols[:5],
             )
@@ -324,6 +342,7 @@ class DataCleaner:
             DataFrame with columns ``["nan_count", "nan_pct"]``,
             sorted by ``nan_count`` descending, showing only columns
             that have at least one NaN.
+
         """
         nan_counts = df.isna().sum()
         nan_counts = nan_counts[nan_counts > 0]

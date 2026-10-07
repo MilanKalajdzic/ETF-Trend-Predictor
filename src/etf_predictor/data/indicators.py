@@ -1,6 +1,5 @@
-"""
-indicators.py
--------------
+"""Compute the pandas-ta technical indicators used as features.
+
 Wraps the pandas-ta library to compute the full set of technical
 indicators used in Sagaceta-Mejía et al. (2024), Section 2.3.
 
@@ -24,7 +23,6 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Sequence
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -90,12 +88,13 @@ class TechnicalIndicators:
     >>> df_indicators = ti.compute(df_ohlcv)
     >>> ti.find_noncausal_columns(df_ohlcv)
     []
+
     """
 
     def __init__(
         self,
-        categories: Optional[list[str]] = None,
-        exclude_cols: Optional[list[str]] = None,
+        categories: list[str] | None = None,
+        exclude_cols: list[str] | None = None,
         drop_noncausal: bool = True,
     ) -> None:
         self.categories = categories or ALL_CATEGORIES
@@ -133,6 +132,7 @@ class TechnicalIndicators:
         ------
         ImportError
             If ``pandas_ta`` is not installed.
+
         """
         try:
             import pandas_ta as ta  # noqa: F401, PLC0415
@@ -236,6 +236,7 @@ class TechnicalIndicators:
         -------
         list[str]
             Sorted names of non-causal columns (empty if all are causal).
+
         """
         n = len(df)
         if cut_points is None:
@@ -263,6 +264,7 @@ class TechnicalIndicators:
         -------
         list[str]
             Sorted list of pandas-ta indicator names.
+
         """
         return sorted(self._get_indicator_list())
 

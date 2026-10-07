@@ -69,10 +69,13 @@ ignore = [
     "D104", # missing docstring in public package
     "D203", # one-blank-line-before-class (conflicts with D211)
     "D213", # multi-line-summary-second-line (conflicts with D212)
+    "D107", # __init__ parameters are documented in the class docstring
+    "N803", # X / y argument names follow the scikit-learn convention
+    "N806", # same convention for local variables
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["D"]    # no docstring enforcement in tests
+"tests/*" = ["D", "E402"]    # no docstrings; imports may follow importorskip
 "notebooks/*" = ["D", "E402"]
 
 # ---------------------------------------------------------------------------

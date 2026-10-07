@@ -8,15 +8,16 @@ import pytest
 
 torch = pytest.importorskip("torch")
 
-from etf_predictor.models.equity import ( 
+from etf_predictor.models.equity import (
     apply_transaction_costs,
     build_comparison,
     equity_curve,
     summary_metrics,
 )
-from etf_predictor.models.lstm_value import LSTMValueModel  
-from etf_predictor.models.mlp_signal import MLPSignalModel 
+from etf_predictor.models.lstm_value import LSTMValueModel
+from etf_predictor.models.mlp_signal import MLPSignalModel
 from etf_predictor.models.walk_forward import WalkForwardValidator
+
 
 def _make_dataset(n: int = 400, n_features: int = 8) -> tuple[pd.DataFrame, pd.Series]:
     """Synthetic dataset with a learnable target and a simulated price."""

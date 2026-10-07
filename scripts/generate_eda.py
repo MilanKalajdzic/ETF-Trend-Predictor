@@ -1,7 +1,5 @@
-"""
-scripts/generate_eda.py
------------------------
-Generates all EDA figures and saves them to reports/figures/.
+"""Generate all EDA figures and save them to reports/figures/.
+
 Called via `make eda`.
 """
 

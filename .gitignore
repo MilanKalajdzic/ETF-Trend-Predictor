@@ -47,3 +47,4 @@ docs/_build/
 # OS
 .DS_Store
 Thumbs.db
+coverage.md

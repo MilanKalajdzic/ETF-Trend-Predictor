@@ -1,7 +1,4 @@
-"""
-pipeline.py
------------
-Orchestrates the full data preparation workflow.
+"""Orchestrate the full data preparation workflow.
 
 Steps (matching CRISP-DM and the paper's Section 2):
     1. Load raw OHLCV data          (YahooFinanceLoader)
@@ -24,7 +21,6 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 
@@ -79,6 +75,7 @@ class DataPipeline:
     >>> datasets = pipeline.run()
     >>> datasets["IEUR"].shape
     (2400, 217)  # approximate
+
     """
 
     def __init__(
@@ -88,7 +85,7 @@ class DataPipeline:
         end: str = "2026-05-01",
         cache_dir: str | Path = "data/raw",
         processed_dir: str | Path = "data/processed",
-        indicator_categories: Optional[list[str]] = None,
+        indicator_categories: list[str] | None = None,
         cleaning_strategy: str = "drop_rows",
         horizon: int = 1,
         include_benchmark: bool = True,
@@ -148,6 +145,7 @@ class DataPipeline:
         dict[str, pd.DataFrame]
             Mapping of ticker → fully processed DataFrame, with all
             indicator columns, the ``"Gamma"`` target, and no NaNs.
+
         """
         logger.info("=== DataPipeline.run() started ===")
 
@@ -181,6 +179,7 @@ class DataPipeline:
         pd.DataFrame
             One row per ticker with columns:
             ``["rows", "features", "up_pct", "down_pct"]``.
+
         """
         records = []
         for ticker, df in datasets.items():
@@ -218,6 +217,7 @@ class DataPipeline:
         -------
         pd.DataFrame
             Fully processed DataFrame.
+
         """
         # Step 2 – Compute technical indicators
         df = self._indicator_engine.compute(df_raw)

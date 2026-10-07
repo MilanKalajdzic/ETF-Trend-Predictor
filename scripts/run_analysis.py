@@ -1,15 +1,17 @@
 from pathlib import Path
+
 import pandas as pd
 
 from etf_predictor.analysis.correlation_analysis import CorrelationAnalyzer
 from etf_predictor.analysis.feature_analysis import FeatureAnalyzer
 from etf_predictor.analysis.feature_importance import FeatureImportanceAnalyzer
+from etf_predictor.analysis.time_series import TimeSeriesAnalyzer
 from etf_predictor.data.loader import YahooFinanceLoader
 from etf_predictor.data.pipeline import DataPipeline
-from etf_predictor.analysis.time_series import TimeSeriesAnalyzer
 
 
 def main() -> None:
+    """Run the statistical analysis for every processed ETF."""
     pipeline = DataPipeline()
     datasets = pipeline.run()
 
@@ -128,6 +130,6 @@ def main() -> None:
                 results_dir / f"{ticker}_arima_summary.csv",
                 index=False,
             )
-            
+
 if __name__ == "__main__":
     main()

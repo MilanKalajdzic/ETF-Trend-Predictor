@@ -48,7 +48,7 @@ install-dev:
 
 # ── Linting & formatting ─────────────────────────────────────────────────────
 lint:
-	ruff check $(SRC) $(TESTS)
+	ruff check $(SRC) $(TESTS) scripts
 
 format:
 	ruff format $(SRC) $(TESTS)

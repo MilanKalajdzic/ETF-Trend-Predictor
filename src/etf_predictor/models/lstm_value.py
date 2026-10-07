@@ -17,7 +17,6 @@ stationary, so the same target scale holds out of sample.
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -74,6 +73,7 @@ class LSTMValueModel:
     price_col : str
     device : str or None
     random_state : int
+
     """
 
     def __init__(
@@ -87,7 +87,7 @@ class LSTMValueModel:
         batch_size: int = 64,
         weight_decay: float = 1e-5,
         price_col: str = "Close",
-        device: Optional[str] = None,
+        device: str | None = None,
         random_state: int = 42,
     ) -> None:
         self.sequence_length = sequence_length
@@ -102,19 +102,19 @@ class LSTMValueModel:
         self.random_state = random_state
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
 
-        self._model: Optional[_LSTMNet] = None
-        self._feature_cols: Optional[list[str]] = None
+        self._model: _LSTMNet | None = None
+        self._feature_cols: list[str] | None = None
         # Mean and standard deviation of the training returns, used to
         # standardise the regression target and to invert predictions.
-        self._ret_mean: Optional[float] = None
-        self._ret_std: Optional[float] = None
+        self._ret_mean: float | None = None
+        self._ret_std: float | None = None
 
 
     def fit(
         self,
         X: pd.DataFrame,
         close_unscaled: pd.Series,
-    ) -> "LSTMValueModel":
+    ) -> LSTMValueModel:
         """Fit the network to predict next-day returns.
 
         Parameters
@@ -205,7 +205,7 @@ class LSTMValueModel:
     def predict_return(
         self,
         X: pd.DataFrame,
-        history: Optional[pd.DataFrame] = None,
+        history: pd.DataFrame | None = None,
     ) -> pd.Series:
         """Predict the next-day return for every row of *X*.
 
@@ -258,7 +258,7 @@ class LSTMValueModel:
     def predict_signal(
         self,
         X: pd.DataFrame,
-        history: Optional[pd.DataFrame] = None,
+        history: pd.DataFrame | None = None,
     ) -> np.ndarray:
         """Convert predicted returns into a ±1 trading signal.
 
