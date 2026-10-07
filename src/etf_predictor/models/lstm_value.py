@@ -1,8 +1,17 @@
-"""
+"""LSTM regressor for next-day returns.
 
-LSTM regressor that predicts the next-day Close price from a fixed 
-window of past features, then converts the predicted price into signal
+The network reads a fixed window of past features and predicts the
+next day's simple return of the close. The sign of the prediction is
+the trading signal: long when the predicted return is positive, short
+otherwise.
 
+Predicting the return rather than the price level matters in a
+walk-forward setting. A level target has to be scaled to the training
+window's price range, and when the price later trades above anything
+seen in training (new highs), the network cannot predict a level that
+high. Its prediction then sits below the current price and the signal
+is stuck short for as long as the uptrend lasts. Returns are
+stationary, so the same target scale holds out of sample.
 """
 
 from __future__ import annotations
@@ -50,7 +59,8 @@ class _LSTMNet(nn.Module):
 
 
 class LSTMValueModel:
-    """
+    """LSTM regressor that predicts next-day returns.
+
     Parameters
     ----------
     sequence_length : int
@@ -94,10 +104,10 @@ class LSTMValueModel:
 
         self._model: Optional[_LSTMNet] = None
         self._feature_cols: Optional[list[str]] = None
-        # Min/Max for Close, fit on training data — used to invert the
-        # scaled regression target back to price space.
-        self._close_min: Optional[float] = None
-        self._close_max: Optional[float] = None
+        # Mean and standard deviation of the training returns, used to
+        # standardise the regression target and to invert predictions.
+        self._ret_mean: Optional[float] = None
+        self._ret_std: Optional[float] = None
 
 
     def fit(
@@ -105,13 +115,21 @@ class LSTMValueModel:
         X: pd.DataFrame,
         close_unscaled: pd.Series,
     ) -> "LSTMValueModel":
-        """
+        """Fit the network to predict next-day returns.
+
         Parameters
         ----------
         X : pd.DataFrame
+            Scaled features for the training window.
         close_unscaled : pd.Series
+            Close price in price units, aligned with *X*. Only its daily
+            returns are used as the target.
+
         Returns
+        -------
         LSTMValueModel
+            The fitted model.
+
         """
         torch.manual_seed(self.random_state)
         np.random.seed(self.random_state)
@@ -124,17 +142,20 @@ class LSTMValueModel:
             )
 
         self._feature_cols = list(X.columns)
-        self._close_min = float(close_unscaled.min())
-        self._close_max = float(close_unscaled.max())
-        denom = self._close_max - self._close_min
-        if denom == 0:
-            raise ValueError("Close series has zero variance — cannot scale.")
+        # Target for the window ending at row i - 1 is the return from
+        # row i - 1 to row i, so every target lies inside the training
+        # window.
+        returns = close_unscaled.pct_change()
+        self._ret_mean = float(returns.mean())
+        self._ret_std = float(returns.std())
+        if not self._ret_std > 0:
+            raise ValueError("Close returns have zero variance, cannot scale.")
 
-        close_scaled = (close_unscaled - self._close_min) / denom
+        target = ((returns - self._ret_mean) / self._ret_std).fillna(0.0)
 
         seqs, targets = self._make_sequences(
             X.to_numpy(dtype=np.float32),
-            close_scaled.to_numpy(dtype=np.float32),
+            target.to_numpy(dtype=np.float32),
         )
         if len(seqs) == 0:
             raise ValueError(
@@ -181,21 +202,28 @@ class LSTMValueModel:
                 )
         return self
 
-    def predict_close(
+    def predict_return(
         self,
         X: pd.DataFrame,
         history: Optional[pd.DataFrame] = None,
     ) -> pd.Series:
-        """
-        Predict next-day Close 
+        """Predict the next-day return for every row of *X*.
 
         Parameters
         ----------
         X : pd.DataFrame
+            Scaled features to predict on.
         history : pd.DataFrame or None
+            Rows preceding *X* (typically the tail of the training
+            window), so the first rows of *X* get a full look-back
+            window.
+
         Returns
+        -------
         pd.Series
-            Predicted next-day Close, indexed by ``X.index``.
+            Predicted return from each day to the next, indexed by
+            ``X.index``. NaN where the look-back window is incomplete.
+
         """
         self._check_fitted()
         if history is None:
@@ -211,7 +239,7 @@ class LSTMValueModel:
             windows.append(arr[i - self.sequence_length + 1: i + 1])
         if not windows:
             return pd.Series(
-                [np.nan] * len(X), index=X.index, name="pred_close"
+                [np.nan] * len(X), index=X.index, name="pred_return"
             )
 
         x_t = torch.from_numpy(np.stack(windows)).to(self.device)
@@ -219,55 +247,51 @@ class LSTMValueModel:
         with torch.no_grad():
             preds_scaled = self._model(x_t).cpu().numpy()
 
-        preds_close = (
-            preds_scaled * (self._close_max - self._close_min)
-            + self._close_min
-        )
+        preds = preds_scaled * self._ret_std + self._ret_mean
 
         # Align predictions with the requested output index. Each window
         # ends at row (sequence_length - 1 + i) of feature_df.
         last_idx = feature_df.index[self.sequence_length - 1:]
-        full = pd.Series(preds_close, index=last_idx, name="pred_close")
+        full = pd.Series(preds, index=last_idx, name="pred_return")
         return full.reindex(X.index)
 
     def predict_signal(
         self,
         X: pd.DataFrame,
-        current_close: pd.Series,
         history: Optional[pd.DataFrame] = None,
     ) -> np.ndarray:
-        """
-        Convert predicted-close into a ±1 trading signal.
+        """Convert predicted returns into a ±1 trading signal.
 
         Parameters
+        ----------
         X : pd.DataFrame
-        current_close : pd.Series
+            Scaled features to predict on.
         history : pd.DataFrame or None
+            Rows preceding *X*, see :meth:`predict_return`.
 
         Returns
+        -------
         np.ndarray
-            Signals in {+1, -1}, where +1 = long and -1 = short.
+            Signals in {+1, -1}: +1 (long) when the predicted next-day
+            return is positive, -1 (short) otherwise.
+
         """
-        pred = self.predict_close(X, history=history)
-        if not current_close.index.equals(X.index):
-            current_close = current_close.reindex(X.index)
-        ret = (pred - current_close) / current_close
-        signal = np.where(ret.fillna(0.0) > 0, 1, -1).astype(np.int8)
-        return signal
+        pred = self.predict_return(X, history=history)
+        return np.where(pred.fillna(0.0) > 0, 1, -1).astype(np.int8)
 
     def _make_sequences(
-        self, features: np.ndarray, target_scaled: np.ndarray,
+        self, features: np.ndarray, target: np.ndarray,
     ) -> tuple[np.ndarray, np.ndarray]:
         """Build (n_samples, seq_len, n_features) and next-day targets."""
         seqs, ys = [], []
         for i in range(self.sequence_length, len(features)):
             seqs.append(features[i - self.sequence_length: i])
-            ys.append(target_scaled[i])
+            ys.append(target[i])
         return (
             np.stack(seqs) if seqs else np.empty((0,)),
             np.asarray(ys, dtype=np.float32),
         )
 
     def _check_fitted(self) -> None:
-        if self._model is None or self._close_min is None:
+        if self._model is None or self._ret_std is None:
             raise RuntimeError("Call fit() before predict_*().")

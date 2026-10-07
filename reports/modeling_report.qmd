@@ -29,9 +29,9 @@ passive **buy-and-hold** baseline:
 - **MLP signal model** — a small multilayer perceptron that predicts
   the next-day trend direction Γ(t) ∈ {+1, −1} as a binary
   classification target.
-- **LSTM value model** — a recurrent network that regresses next-day
-  `Close` from a 20-day look-back window of features; the predicted
-  return is converted to a ±1 trading signal at inference time.
+- **LSTM value model** — a recurrent network that regresses the
+  next-day return from a 20-day look-back window of features; the sign
+  of the predicted return is the ±1 trading signal.
 
 Both models are evaluated with an **expanding-window walk-forward
 validator** so every test fold is strictly out-of-sample. Per-fold
@@ -75,11 +75,17 @@ scratch on every fold inside the walk-forward loop without a GPU.
 
 ### 2.2 LSTM value model — `LSTMValueModel`
 
-The LSTM is trained as a **regressor on the next-day closing price**,
-not as a classifier. This more closely mirrors the design choice in
-Sagaceta-Mejía et al. (2024) where the recurrent network learns the
-price dynamics directly and a trading signal is derived from the
-implied return.
+The LSTM is trained as a **regressor on the next-day return**, not as
+a classifier, so it learns the size of moves as well as their
+direction, and the trading signal is the sign of the predicted return.
+
+An earlier version regressed the next-day closing *price*, min-max
+scaled on the training fold. That target breaks out of sample in a
+rising market: once the price trades above the training range, the
+network cannot predict a level that high, its prediction falls below
+the current price, and the signal stays short for as long as the
+uptrend lasts. Daily returns are stationary, so a scale fitted on the
+training fold still holds in the test fold.
 
 Architecture ([src/etf_predictor/models/lstm_value.py](../src/etf_predictor/models/lstm_value.py)):
 
@@ -91,9 +97,10 @@ Input (batch, seq_len=20, n_features) → LSTM(hidden=64, layers=1)
 
 Training details:
 
-- **Target:** scaled next-day `Close` (min-max scaled on the training
-  fold; min/max stored so predictions can be back-transformed).
-- **Loss:** `MSELoss` in the scaled price space.
+- **Target:** next-day simple return of `Close`, standardised with the
+  training fold's mean and standard deviation (stored so predictions
+  can be mapped back to returns).
+- **Loss:** `MSELoss` on the standardised return.
 - **Optimiser:** Adam, lr = 1e-3, weight_decay = 1e-5.
 - **Batch size:** 64, **epochs:** 20, **sequence length:** 20 trading
   days, seeded with `random_state=42`.
@@ -101,10 +108,13 @@ Training details:
 Signal derivation at inference:
 
 $$
-\hat{r}_t = \frac{\hat{\text{Close}}_{t+1} - \text{Close}_t}{\text{Close}_t},
+\hat{r}_{t+1} = \hat{\mu} + \hat{\sigma}\, f_\theta(x_{t-19}, \dots, x_t),
 \quad
-\text{signal}_t = \begin{cases} +1 & \hat{r}_t > 0 \\ -1 & \text{otherwise} \end{cases}
+\text{signal}_t = \begin{cases} +1 & \hat{r}_{t+1} > 0 \\ -1 & \text{otherwise} \end{cases}
 $$
+
+where $f_\theta$ is the network output and $\hat{\mu}$, $\hat{\sigma}$
+are the training fold's mean and standard deviation of daily returns.
 
 To predict for the very first row of a test fold, the validator passes
 the **tail of the training set** (the most recent `sequence_length`
@@ -116,8 +126,8 @@ the warm-up window.
 - The MLP captures **point-in-time pattern recognition** across the
   ~260 indicators built in the preprocessing stage.
 - The LSTM captures **temporal dependence** across the trailing
-  20-day window of those same indicators and is anchored to the real
-  price target rather than the noisy ±1 label.
+  20-day window of those same indicators and learns the size of
+  returns rather than only the noisy ±1 label.
 
 Both models emit the same ±1 signal schema, so they plug into the same
 walk-forward harness and the same equity-curve evaluator.

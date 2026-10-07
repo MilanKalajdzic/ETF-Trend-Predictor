@@ -72,7 +72,7 @@ class WalkForwardValidator:
     - ``df_scaled``: the modeling-ready frame produced by ``DataPipeline``
       (features in [0, 1] plus the ``Gamma`` column).
     - ``close_unscaled``: the raw ``Close`` series in price units, used
-      for the LSTM regression target and for computing strategy returns.
+      for the LSTM's return target and for computing strategy returns.
     """
 
     def __init__(
@@ -167,11 +167,7 @@ class WalkForwardValidator:
             test_df: pd.DataFrame,
         ) -> np.ndarray:
             history = train_df[feature_cols].tail(model.sequence_length)
-            return model.predict_signal(
-                test_df[feature_cols],
-                current_close=close_unscaled.loc[test_df.index],
-                history=history,
-            )
+            return model.predict_signal(test_df[feature_cols], history=history)
 
         return self._run(
             df_scaled=df_scaled,
