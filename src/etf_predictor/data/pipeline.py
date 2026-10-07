@@ -7,11 +7,17 @@ Steps (matching CRISP-DM and the paper's Section 2):
     1. Load raw OHLCV data          (YahooFinanceLoader)
     2. Compute technical indicators  (TechnicalIndicators)
     3. Build the Γ target            (TargetBuilder)
-    4. Normalize features            (MinMaxScaler)
+    4. Normalize features            (ExpandingMinMaxScaler, causal)
     5. Clean NaN rows                (DataCleaner)
 
-The output is a dict of clean, scaled, labelled DataFrames — one per
-ticker — ready for feature selection and model training.
+The output is a dict of clean, scaled, labelled DataFrames, one per
+ticker, ready for feature selection and model training. Every feature
+value at day t is computed from data up to and including day t, so the
+output can be split into walk-forward folds without look-ahead leakage.
+
+Run as a module to rebuild ``data/processed/``::
+
+    PYTHONPATH=src python -m etf_predictor.data.pipeline
 """
 
 from __future__ import annotations
@@ -24,7 +30,7 @@ import pandas as pd
 
 from etf_predictor.data.indicators import TechnicalIndicators
 from etf_predictor.data.loader import YahooFinanceLoader
-from etf_predictor.data.preprocessing import DataCleaner, MinMaxScaler
+from etf_predictor.data.preprocessing import DataCleaner, ExpandingMinMaxScaler
 from etf_predictor.data.targets import TargetBuilder
 
 logger = logging.getLogger(__name__)
@@ -108,8 +114,12 @@ class DataPipeline:
             cache_dir=self.cache_dir,
             include_benchmark=self.include_benchmark,
         )
+        # "Adj Close" is excluded from the features: Yahoo back-adjusts it
+        # with dividends paid after each day, so its value at day t is
+        # revised whenever a later dividend arrives (look-ahead).
         self._indicator_engine = TechnicalIndicators(
-            categories=self.indicator_categories
+            categories=self.indicator_categories,
+            exclude_cols=["Adj Close"],
         )
         self._target_builder = TargetBuilder(
             horizon=self.horizon,
@@ -215,19 +225,10 @@ class DataPipeline:
         # Step 3 – Build target Γ (drops first `horizon` rows)
         df = self._target_builder.build(df)
 
-        # Step 4 – Normalize features (fit on full set here; the
-        # modeling team is responsible for train/test split before
-        # calling transform in cross-validation).
-        # We expose a fitted scaler per ticker for convenience.
-        scaler = MinMaxScaler(exclude_cols=[TARGET_COL])
-        feature_cols = [c for c in df.columns if c != TARGET_COL]
-        scaler.fit(df[feature_cols])
-        df = scaler.transform(df)
-        # Store scaler for later use by the modeling team
-        self._scalers: dict[str, MinMaxScaler] = getattr(
-            self, "_scalers", {}
-        )
-        self._scalers[ticker] = scaler
+        # Step 4 – Normalize features causally: each value is scaled with
+        # the min/max observed up to that day, never the full sample, so
+        # walk-forward folds cut from this frame see no future ranges.
+        df = ExpandingMinMaxScaler(exclude_cols=[TARGET_COL]).transform(df)
 
         # Step 5 – Clean NaN rows
         df = self._cleaner.clean(df)
@@ -242,3 +243,12 @@ class DataPipeline:
         path = self.processed_dir / f"{ticker}_processed.parquet"
         df.to_parquet(path)
         logger.info("Saved processed data: %s", path)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+    )
+    pipeline = DataPipeline()
+    print(pipeline.summary(pipeline.run(save=True)))

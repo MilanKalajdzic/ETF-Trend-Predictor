@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white" alt="Python 3.12">
   <img src="https://img.shields.io/badge/PyTorch-CPU-EE4C2C?logo=pytorch&logoColor=white" alt="PyTorch">
   <img src="https://img.shields.io/badge/reports-Quarto-75AADB?logo=quarto&logoColor=white" alt="Quarto reports">
-  <img src="https://img.shields.io/badge/tests-39%20unit%20tests-0A9EDC?logo=pytest&logoColor=white" alt="39 unit tests">
+  <img src="https://img.shields.io/badge/tests-58%20unit%20tests-0A9EDC?logo=pytest&logoColor=white" alt="58 unit tests">
   <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff"></a>
 </p>
 
@@ -22,6 +22,7 @@
   <a href="#quick-start">Quick start</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="#results">Results</a> ·
+  <a href="#look-ahead-audit">Look-ahead audit</a> ·
   <a href="#reports">Reports</a> ·
   <a href="#development">Development</a> ·
   <a href="#limitations">Limitations</a>
@@ -35,12 +36,12 @@
 |---|---|
 | **Universe** | IEUR, FEZ, EUFN (Europe) against IVV (US benchmark) |
 | **Data** | Daily OHLCV from Yahoo Finance, 2010 to April 2026 |
-| **Features** | ~260 technical indicators across 10 pandas-ta categories |
+| **Features** | ~250 look-ahead-free technical indicators across 10 pandas-ta categories |
 | **Target** | Γ(t) = +1 if Open(t) > Open(t−1), else −1 |
 | **Models** | MLP signal classifier and LSTM next-close regressor (PyTorch) |
-| **Validation** | Expanding-window walk-forward, ~22 folds per ticker, benchmarked against buy-and-hold |
+| **Validation** | Expanding-window walk-forward, 16 to 25 six-month folds per ticker, benchmarked against buy-and-hold |
 | **Baselines** | Random Forest feature importance, ADF stationarity tests, ARIMA(1,1,1) |
-| **Reproducibility** | One Docker image, Makefile automation, 39 unit tests, Sphinx API docs |
+| **Reproducibility** | One Docker image, Makefile automation, 58 unit tests, Sphinx API docs |
 
 ---
 
@@ -77,9 +78,9 @@ The default command (`make report`) runs the whole pipeline from scratch: downlo
 ```mermaid
 flowchart LR
     A["Yahoo Finance<br/>daily OHLCV"] --> B["Loader<br/>parquet cache"]
-    B --> C["pandas-ta<br/>~260 indicators"]
+    B --> C["pandas-ta<br/>~250 indicators"]
     C --> D["Target Γ(t)<br/>open-to-open direction"]
-    D --> E["Min-max scaling<br/>and cleaning"]
+    D --> E["Causal scaling<br/>and cleaning"]
     E --> F[("Processed<br/>datasets")]
     F --> G["Statistical analysis<br/>variance · correlation<br/>RF · ADF · ARIMA"]
     F --> H["Walk-forward models<br/>MLP · LSTM"]
@@ -89,7 +90,7 @@ flowchart LR
 
 | Stage | Package | What it does |
 |---|---|---|
-| **1. Data** | `etf_predictor.data` | Downloads and caches prices, computes ~260 indicators, builds the Γ(t) target, scales features to [0, 1], drops sparse columns and forward-fills warm-up gaps |
+| **1. Data** | `etf_predictor.data` | Downloads and caches prices, computes ~250 indicators and drops any that use future prices, builds the Γ(t) target, scales features to [0, 1] with an expanding window, drops sparse columns and forward-fills warm-up gaps |
 | **2. Analysis** | `etf_predictor.analysis` | Low-variance and correlation redundancy checks, Random Forest feature importance, ADF stationarity tests, ARIMA(1,1,1) baseline |
 | **3. Modeling** | `etf_predictor.models` | MLP signal and LSTM next-close models trained in an expanding window, long/short equity curves against buy-and-hold, top-10 feature ablation |
 
@@ -97,16 +98,39 @@ flowchart LR
 
 ## Results
 
-Out-of-sample walk-forward results, trading long/short on each model's daily signal. Annualised Sharpe ratios, no transaction costs:
+Out-of-sample walk-forward results, trading long/short on each model's daily signal, with all features and with only the top-10 Random Forest features. Annualised Sharpe ratios, no transaction costs:
 
-| Ticker | MLP | LSTM | Buy & hold |
-|:---|---:|---:|---:|
-| IEUR | −0.04 | 0.01 | 0.33 |
-| FEZ | −0.08 | 1.67\* | 0.23 |
-| EUFN | 1.00\* | 1.55\* | 0.19 |
-| IVV | −0.27 | 0.06 | 0.66 |
+| Ticker | MLP | LSTM | MLP top-10 | LSTM top-10 | Buy & hold |
+|:---|---:|---:|---:|---:|---:|
+| IEUR | 0.12 | −0.01 | 0.04 | 0.29 | 0.28 |
+| FEZ | 0.01 | 0.05 | −0.12 | 0.18 | 0.17 |
+| EUFN | 0.60 | 0.24 | 0.54 | −0.01 | 0.15 |
+| IVV | −0.26 | −0.57 | −0.14 | −0.74 | 0.66 |
 
-On the broad indices (IEUR, IVV) neither network beats buy-and-hold, which is what weak-form efficiency would predict. The starred results do **not** hold up: retrained on only the top-10 features they fall to 0.20 (FEZ LSTM), 0.44 (EUFN MLP) and −0.17 (EUFN LSTM), and Sharpe ratios this high from a hit rate of roughly 52% are a classic sign of look-ahead leakage. See [Limitations](#limitations). Per-fold metrics and equity curves are in the modeling report.
+**The short version: technical indicators do not beat the market here.** On the US benchmark both networks lose money while buy-and-hold earns a Sharpe of 0.66, and on IEUR and FEZ the best runs only match buy-and-hold.
+
+EUFN is the one exception, with the MLP at 0.60 (0.54 on the top-10 features) against 0.15 for buy-and-hold. We do not read this as an edge. Its hit rate is barely above 50%, so the profit comes from a handful of large moves in a sector with deep drawdowns. A Sharpe of 0.60 over 12 years is a t-statistic of about 2.1, which does not survive a correction for the 16 runs in this table, and the strategy trades daily with no costs deducted.
+
+Per-fold metrics and equity curves are in the modeling report.
+
+---
+
+## Look-ahead audit
+
+The first version of this pipeline reported Sharpe ratios above 1.5 and total returns over 2,600%. Tracing those numbers uncovered four kinds of look-ahead leakage, all now fixed and covered by tests:
+
+- **Non-causal indicators.** Five pandas-ta indicators use future prices with their default settings: DPO (centred), the Ichimoku chikou span, the `TOS_STDEVALL` regression bands, VHM and ZIGZAG. They were found by recomputing every indicator on data truncated at day t and checking whether any earlier value changed.
+- **Fake future rows.** Ichimoku's forward projections, dated after the last trading day, were being appended to the dataset.
+- **Full-sample scaling.** Min-max scaling used the whole history, so every walk-forward fold saw the future range of each feature. It now uses an expanding window.
+- **Adjusted prices.** Yahoo's `Adj Close` is back-adjusted with dividends paid later, so it was dropped as a feature.
+
+| Run (all features) | Sharpe before | Sharpe after | Total return before | Total return after |
+|:---|---:|---:|---:|---:|
+| FEZ LSTM | 1.67 | 0.05 | +2,613% | +14% |
+| EUFN LSTM | 1.55 | 0.24 | +2,883% | +94% |
+| EUFN MLP | 1.00 | 0.60 | +905% | +402% |
+
+An end-to-end test now rebuilds the processed dataset with the future cut off and fails if any past value changes.
 
 ---
 
@@ -199,13 +223,12 @@ Raw prices are cached as parquet under `data/raw/` and are not committed. IEUR h
 
 ## Limitations
 
-> [!WARNING]
-> Known issues, listed so the results above can be read correctly.
+> [!NOTE]
+> What the results above can and cannot tell you.
 
-- **Non-causal indicators.** By default some pandas-ta indicators use future prices: DPO is centred and the Ichimoku chikou span (`ICS_26`) is the close shifted backwards in time. Both are in the current feature set and are the prime suspects for the starred results.
-- **Scaling leakage.** Min-max scaling is fitted on the full sample before the walk-forward split, so every fold sees the range of later prices.
-- **Same-day label.** Following the paper, Γ(t) is predicted from same-day indicators, so the Random Forest accuracy in the statistical report measures contemporaneous fit rather than forecasting skill.
-- **No trading frictions.** Returns ignore transaction costs, spreads and shorting costs.
+- **Same-day label.** Following the paper, Γ(t) is predicted from same-day indicators, so the Random Forest accuracy in the statistical report (76 to 81%) measures contemporaneous fit rather than forecasting skill.
+- **No trading frictions.** Returns ignore transaction costs, spreads and shorting costs, which matter for a strategy that can flip position every day.
+- **One seed per model.** Each network is trained with a single fixed seed, so how much these Sharpe ratios vary between training runs is unknown.
 
 ---
 

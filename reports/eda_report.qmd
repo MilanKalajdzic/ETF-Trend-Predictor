@@ -126,9 +126,26 @@ pipeline.summary(datasets)
 ### 4.1 Technical Indicators
 
 The Pandas TA library (v0.4.x) expands the 6 base OHLCV features to
-**~260 daily features** across 10 categories. Sparse columns with more
+**~250 daily features** across 10 categories. Sparse columns with more
 than 95% NaN values (e.g. ZIGZAG) are automatically removed before
-cleaning:
+cleaning.
+
+**Look-ahead check.** Every indicator is tested for causality by
+recomputing it on data truncated at day t and checking that none of
+its values up to day t change. With default settings, five pandas-ta
+indicators fail this test and are dropped: DPO (centred, shifts the
+close backwards), the Ichimoku chikou span `ICS_26` (the close 26 days
+in the future), the `TOS_STDEVALL` regression bands (fitted on the
+whole sample), `VHM` (normalised with future data) and `ZIGZAG` (pivots
+confirmed only by later prices). Ichimoku's forward span projections,
+dated after the last trading day, are also discarded. The check runs in
+the unit tests, so a library upgrade that introduces a new look-ahead
+indicator fails the build.
+
+The raw `Adj Close` column is excluded from the features as well: Yahoo
+back-adjusts it with dividends paid after each day, so its historical
+values are revised whenever a new dividend arrives. Indicators are
+computed on the unadjusted `Close`.
 
 | Category | Examples |
 |----------|---------|
@@ -170,13 +187,16 @@ full 2010–2026 period including both bull and bear market phases.*
 
 ### 5.1 Normalisation
 
-Min-max scaling is applied per feature to the range **[0, 1]**:
+Each feature is min-max scaled to **[0, 1]**, but causally: the min
+and max are those observed **up to that day**, not over the whole
+sample:
 
-$$\hat{x} = \frac{x - \min}{\max - \min}$$
+$$\hat{x}_t = \frac{x_t - \min_{s \le t} x_s}{\max_{s \le t} x_s - \min_{s \le t} x_s}$$
 
-**Important:** the scaler is fit on training data only and applied to
-the test split, preventing target leakage — a gap not addressed
-explicitly in the original paper.
+The paper scales with full-sample statistics, which leaks the future
+range of every feature into earlier rows once the data is split into
+walk-forward folds. Expanding-window scaling avoids this while keeping
+a single processed dataset that every fold can share.
 
 ### 5.2 Cleaning
 
@@ -212,10 +232,10 @@ plt.show()
 The modeling team receives:
 
 - **Location:** `data/processed/{TICKER}_processed.parquet`
-- **Schema:** DatetimeIndex + ~260 numeric feature columns + `"Gamma"` target column
+- **Schema:** DatetimeIndex + ~250 numeric feature columns + `"Gamma"` target column
 - **Values:** All features scaled to [0, 1]; `Gamma` ∈ {+1, -1}; zero NaNs
-- **Scaler access:** `pipeline._scalers[ticker]` — must be applied correctly
-  inside cross-validation folds to avoid leakage
+- **Causality:** every feature value at day t uses only data up to day t,
+  so the frame can be split into walk-forward folds as is
 - **Note:** IEUR has fewer rows (~2400) than FEZ/EUFN/IVV (~3500) due
   to data availability starting June 2014
 

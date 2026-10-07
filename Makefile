@@ -80,6 +80,7 @@ analysis:
 # ── Modeling (MLP + LSTM + walk-forward backtest) ────────────────────────────
 modeling:
 	$(RUNPY) scripts/run_modeling.py
+	$(RUNPY) scripts/run_modeling.py --top-k-features 10 --feature-suffix _top10
 
 # ── Documentation ────────────────────────────────────────────────────────────
 docs:
@@ -123,6 +124,7 @@ report:
 	$(RUNPY) -m etf_predictor.data.pipeline
 	$(RUNPY) scripts/run_analysis.py
 	$(RUNPY) scripts/run_modeling.py
+	$(RUNPY) scripts/run_modeling.py --top-k-features 10 --feature-suffix _top10
 	quarto render reports/eda_report.qmd
 	quarto render reports/statistical_analysis.qmd
 	quarto render reports/modeling_report.qmd
