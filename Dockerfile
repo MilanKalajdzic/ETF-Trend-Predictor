@@ -61,13 +61,13 @@ COPY .pre-commit-config.yaml ./
 # Reports — qmd sources + pre-computed CSVs and figures (no .html)
 COPY reports/ ./reports/
 
-# Pre-baked pipeline artifacts so `make report` only re-renders Quarto
+# Raw price cache from data/ is baked in if present, otherwise downloaded at run time
 COPY data/ ./data/
 
 LABEL maintainer="ETF Predictor Team" \
-      description="ETF trend prediction —  render-only demo" \
+      description="ETF trend prediction: full pipeline and reports" \
       version="1.0.0" \
-      org.opencontainers.image.source="https://github.com/<your-handle>/etf-predictor"
+      org.opencontainers.image.source="https://github.com/MilanKalajdzic/ETF-Trend-Predictor"
 
 # /output/ is where the published HTML reports land. Bind-mount this
 # directory (`docker run -v $PWD/output:/output ...`) to retrieve the
