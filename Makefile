@@ -81,6 +81,7 @@ analysis:
 modeling:
 	$(RUNPY) scripts/run_modeling.py
 	$(RUNPY) scripts/run_modeling.py --top-k-features 10 --feature-suffix _top10
+	$(RUNPY) scripts/cost_sensitivity.py
 
 # ── Documentation ────────────────────────────────────────────────────────────
 docs:
@@ -125,6 +126,7 @@ report:
 	$(RUNPY) scripts/run_analysis.py
 	$(RUNPY) scripts/run_modeling.py
 	$(RUNPY) scripts/run_modeling.py --top-k-features 10 --feature-suffix _top10
+	$(RUNPY) scripts/cost_sensitivity.py
 	quarto render reports/eda_report.qmd
 	quarto render reports/statistical_analysis.qmd
 	quarto render reports/modeling_report.qmd
