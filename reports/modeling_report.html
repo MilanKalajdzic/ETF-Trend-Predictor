@@ -2387,13 +2387,14 @@ window.Quarto = {
   <li><a href="#ieur-ishares-core-msci-europe" id="toc-ieur-ishares-core-msci-europe" class="nav-link" data-scroll-target="#ieur-ishares-core-msci-europe">5.3 IEUR — iShares Core MSCI Europe</a></li>
   <li><a href="#ivv-ishares-core-sp-500-us-benchmark" id="toc-ivv-ishares-core-sp-500-us-benchmark" class="nav-link" data-scroll-target="#ivv-ishares-core-sp-500-us-benchmark">5.4 IVV — iShares Core S&amp;P 500 (US benchmark)</a></li>
   <li><a href="#cross-ticker-summary" id="toc-cross-ticker-summary" class="nav-link" data-scroll-target="#cross-ticker-summary">5.5 Cross-ticker summary</a></li>
+  <li><a href="#transaction-costs" id="toc-transaction-costs" class="nav-link" data-scroll-target="#transaction-costs">5.6 Transaction costs</a></li>
   </ul></li>
   <li><a href="#feature-selection-top-10-vs-full-feature-set" id="toc-feature-selection-top-10-vs-full-feature-set" class="nav-link" data-scroll-target="#feature-selection-top-10-vs-full-feature-set">6. Feature selection — top-10 vs full feature set</a>
   <ul class="collapse">
   <li><a href="#selected-features-per-ticker" id="toc-selected-features-per-ticker" class="nav-link" data-scroll-target="#selected-features-per-ticker">6.1 Selected features per ticker</a></li>
   <li><a href="#reduced-set-walk-forward-results" id="toc-reduced-set-walk-forward-results" class="nav-link" data-scroll-target="#reduced-set-walk-forward-results">6.2 Reduced-set walk-forward results</a></li>
   <li><a href="#head-to-head-full-features-vs-top-10" id="toc-head-to-head-full-features-vs-top-10" class="nav-link" data-scroll-target="#head-to-head-full-features-vs-top-10">6.3 Head-to-head: full features vs top-10</a></li>
-  <li><a href="#interpretation-why-our-result-diverges-from-the-paper" id="toc-interpretation-why-our-result-diverges-from-the-paper" class="nav-link" data-scroll-target="#interpretation-why-our-result-diverges-from-the-paper">6.4 Interpretation — why our result diverges from the paper</a></li>
+  <li><a href="#interpretation" id="toc-interpretation" class="nav-link" data-scroll-target="#interpretation">6.4 Interpretation</a></li>
   </ul></li>
   <li><a href="#reproducing-the-results" id="toc-reproducing-the-results" class="nav-link" data-scroll-target="#reproducing-the-results">7. Reproducing the results</a></li>
   <li><a href="#limitations-next-steps" id="toc-limitations-next-steps" class="nav-link" data-scroll-target="#limitations-next-steps">8. Limitations &amp; next steps</a></li>
@@ -2521,7 +2522,7 @@ window.Quarto = {
 <section id="why-two-architectures" class="level3">
 <h3 class="anchored" data-anchor-id="why-two-architectures">2.3 Why two architectures?</h3>
 <ul>
-<li>The MLP captures <strong>point-in-time pattern recognition</strong> across the ~260 indicators built in the preprocessing stage.</li>
+<li>The MLP captures <strong>point-in-time pattern recognition</strong> across the ~250 indicators built in the preprocessing stage.</li>
 <li>The LSTM captures <strong>temporal dependence</strong> across the trailing 20-day window of those same indicators and learns the size of returns rather than only the noisy ±1 label.</li>
 </ul>
 <p>Both models emit the same ±1 signal schema, so they plug into the same walk-forward harness and the same equity-curve evaluator.</p>
@@ -2589,7 +2590,7 @@ fold k:  train = [0 : 750+(k-1)·120]  test = [750+(k-1)·120 : 750+k·120]</cod
 </div>
 <section id="results-gallery-equity-curves-across-all-tickers" class="level3">
 <h3 class="anchored" data-anchor-id="results-gallery-equity-curves-across-all-tickers">5.0 Results gallery — equity curves across all tickers</h3>
-<p>A 2×2 view of every walk-forward equity curve. EUFN and FEZ are where both networks decisively beat the passive baseline; IEUR and IVV are where the buy-and-hold line dominates.</p>
+<p>A 2×2 view of every walk-forward equity curve. Only the EUFN MLP separates clearly from the passive baseline; on the other three ETFs the buy-and-hold line ends at or above both networks.</p>
 <div class="quarto-layout-panel" data-layout-ncol="2">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
@@ -2670,7 +2671,7 @@ fold k:  train = [0 : 750+(k-1)·120]  test = [750+(k-1)·120 : 750+k·120]</cod
 </section>
 <section id="eufn-ishares-msci-europe-financials" class="level3">
 <h3 class="anchored" data-anchor-id="eufn-ishares-msci-europe-financials">5.1 EUFN — iShares MSCI Europe Financials</h3>
-<div id="6aa6f307" class="cell" data-execution_count="2">
+<div id="07862542" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>metrics_all[<span class="st">&quot;EUFN&quot;</span>].<span class="bu">round</span>(<span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -2759,11 +2760,11 @@ fold k:  train = [0 : 750+(k-1)·120]  test = [750+(k-1)·120 : 750+k·120]</cod
 </div>
 </div>
 </div>
-<p>EUFN is the most favourable backdrop for the LSTM: the financials sector exhibits persistent trend behaviour that the regressor latches onto. The LSTM compounds to <strong>~29×</strong> the starting equity with a <strong>Sharpe of 1.55</strong>, far above buy-and-hold (~0.6× and Sharpe 0.19). The MLP also clears buy-and-hold (~7.8× total, Sharpe 0.94) but pays for it with a deeper intra-period drawdown profile during 2020.</p>
+<p>EUFN is the only ETF where a network clearly beats buy-and-hold. The MLP compounds to about 5× the starting equity (Sharpe 0.60) against 1.5× for buy-and-hold (Sharpe 0.15), with a shallower maximum drawdown (−36% against −59%). The gain is concentrated: 59% of the MLP’s log return comes from ten days, most of them in the March 2020 crash and the April 2025 tariff selloff, and in most other years the strategy is roughly flat. With a hit rate of 50.4%, this looks like being on the right side of a few extreme days rather than a persistent edge. The LSTM ends slightly below where it started (Sharpe −0.04).</p>
 </section>
 <section id="fez-spdr-euro-stoxx-50" class="level3">
 <h3 class="anchored" data-anchor-id="fez-spdr-euro-stoxx-50">5.2 FEZ — SPDR EURO STOXX 50</h3>
-<div id="c93cd2ce" class="cell" data-execution_count="3">
+<div id="3919be93" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>metrics_all[<span class="st">&quot;FEZ&quot;</span>].<span class="bu">round</span>(<span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -2852,11 +2853,11 @@ fold k:  train = [0 : 750+(k-1)·120]  test = [750+(k-1)·120 : 750+k·120]</cod
 </div>
 </div>
 </div>
-<p>FEZ shows the <strong>largest gap between the two architectures</strong>: the LSTM delivers a Sharpe of <strong>1.67</strong> and ~26× total return, while the MLP loses money over the full out-of-sample window (negative total return, negative Sharpe). The MLP’s per-fold accuracy barely clears 50% and several folds in 2021–2024 drag the strategy into a sustained drawdown, while the LSTM’s price-anchored signal stays directionally correct on the larger swings.</p>
+<p>FEZ is a no-edge case. The MLP finishes almost exactly flat (Sharpe 0.01) and the LSTM loses about a third of its starting equity (Sharpe −0.17), while buy-and-hold returns about 51% (Sharpe 0.17). Per-fold accuracy for both networks scatters around 50%.</p>
 </section>
 <section id="ieur-ishares-core-msci-europe" class="level3">
 <h3 class="anchored" data-anchor-id="ieur-ishares-core-msci-europe">5.3 IEUR — iShares Core MSCI Europe</h3>
-<div id="ee111027" class="cell" data-execution_count="4">
+<div id="0bb845fd" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>metrics_all[<span class="st">&quot;IEUR&quot;</span>].<span class="bu">round</span>(<span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -2945,11 +2946,11 @@ fold k:  train = [0 : 750+(k-1)·120]  test = [750+(k-1)·120 : 750+k·120]</cod
 </div>
 </div>
 </div>
-<p>IEUR is the <strong>hardest case for both models</strong>. Its data only begins in mid-2014, so only 13 folds are available (vs 22–23 for the other tickers) and the models have less history to learn from. Both networks trail buy-and-hold on Sharpe (0.15 / 0.01 vs 0.33) and several folds in 2022–2024 produce sub-50% directional accuracy. This is the clearest example that the two networks need a long, stable training history to outperform.</p>
+<p>IEUR has the shortest history. Its data only begins in mid-2014, so 16 folds are available against 25 for the other tickers and the first model trains on less data. Both networks trail buy-and-hold on Sharpe (MLP 0.12, LSTM −0.12, buy-and-hold 0.28).</p>
 </section>
 <section id="ivv-ishares-core-sp-500-us-benchmark" class="level3">
 <h3 class="anchored" data-anchor-id="ivv-ishares-core-sp-500-us-benchmark">5.4 IVV — iShares Core S&amp;P 500 (US benchmark)</h3>
-<div id="6ced58f3" class="cell" data-execution_count="5">
+<div id="586fb687" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>metrics_all[<span class="st">&quot;IVV&quot;</span>].<span class="bu">round</span>(<span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -3038,7 +3039,7 @@ fold k:  train = [0 : 750+(k-1)·120]  test = [750+(k-1)·120 : 750+k·120]</cod
 </div>
 </div>
 </div>
-<p>IVV is the <strong>adversarial case</strong>: a strong, persistent secular uptrend where buy-and-hold is extremely hard to beat. The benchmark compounds to ~3.4× with a Sharpe of 0.66, while both ML strategies underperform — the MLP turns slightly negative and the LSTM ekes out a marginal positive return. The directional-accuracy bars hover around 0.45–0.50 on most folds, confirming that on a trending US large-cap index a ±1 signal that occasionally goes short is structurally disadvantaged relative to staying long.</p>
+<p>IVV is the hardest benchmark to beat: a strong, persistent uptrend in which buy-and-hold compounds to about 3.7× with a Sharpe of 0.66. The LSTM is the better network here (Sharpe 0.30, about 1.85×), because its return target picks up the positive drift and it is long on about three days in four. The MLP is long only 61% of the time and loses money (Sharpe −0.26). On a trending index, any signal that spends a large share of days short gives up most of the drift.</p>
 </section>
 <section id="cross-ticker-summary" class="level3">
 <h3 class="anchored" data-anchor-id="cross-ticker-summary">5.5 Cross-ticker summary</h3>
@@ -3186,11 +3187,244 @@ fold k:  train = [0 : 750+(k-1)·120]  test = [750+(k-1)·120 : 750+k·120]</cod
 </div>
 <p>Key takeaways from the table:</p>
 <ul>
-<li><strong>LSTM wins on Sharpe in 3 of 4 tickers</strong> (EUFN, FEZ, IVV vs MLP), driven by the price-anchored target and the temporal context window.</li>
-<li><strong>Both models beat buy-and-hold on the two European sector/large-cap ETFs</strong> (EUFN, FEZ) but lose to it on the broad IEUR and the trending IVV.</li>
-<li><strong>Drawdowns are model-dependent</strong>: the LSTM occasionally accepts larger drawdowns (EUFN −35%) in exchange for higher upside, while the MLP tends to keep drawdowns slightly smaller but at the cost of much lower returns.</li>
-<li><strong>Hit rates cluster around 48–53%</strong> across the board — i.e., the signals are only marginally better than coin-flips on a per-day basis, but the magnitude of correctly-called moves drives the Sharpe advantage where it appears.</li>
+<li><strong>Only one of eight full-feature runs beats buy-and-hold</strong>: the EUFN MLP (Sharpe 0.60 against 0.15), and that result rests on a handful of crash days.</li>
+<li><strong>Neither architecture dominates.</strong> The MLP is ahead on the three European ETFs, the LSTM on IVV.</li>
+<li><strong>Hit rates cluster around 48–52%</strong>: the daily signals are close to a coin flip, so where a strategy does well the result comes from the size of a few correctly called moves rather than from frequent correct calls.</li>
+<li><strong>Drawdowns are comparable to buy-and-hold or worse</strong>, with the exception of the EUFN MLP.</li>
 </ul>
+</section>
+<section id="transaction-costs" class="level3">
+<h3 class="anchored" data-anchor-id="transaction-costs">5.6 Transaction costs</h3>
+<p>The results above assume free trading. The networks change position 25 to 107 times a year, so costs matter. <code>scripts/cost_sensitivity.py</code> re-scores every run with a one-way cost per unit traded (a long-to-short flip trades two units) and finds the cost at which each Sharpe ratio reaches zero.</p>
+<div id="cell-cost-sensitivity" class="cell" data-execution_count="7">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>costs <span class="op">=</span> pd.read_csv(RESULTS <span class="op">/</span> <span class="st">&quot;cost_sensitivity.csv&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>costs[[</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;ticker&quot;</span>, <span class="st">&quot;model&quot;</span>, <span class="st">&quot;features&quot;</span>, <span class="st">&quot;flips_per_year&quot;</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;sharpe_0bps&quot;</span>, <span class="st">&quot;sharpe_2bps&quot;</span>, <span class="st">&quot;sharpe_5bps&quot;</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;breakeven_bps&quot;</span>, <span class="st">&quot;buy_and_hold_sharpe&quot;</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>]].<span class="bu">round</span>(<span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div id="cost-sensitivity" class="cell-output cell-output-display" data-execution_count="7">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ticker</th>
+<th data-quarto-table-cell-role="th">model</th>
+<th data-quarto-table-cell-role="th">features</th>
+<th data-quarto-table-cell-role="th">flips_per_year</th>
+<th data-quarto-table-cell-role="th">sharpe_0bps</th>
+<th data-quarto-table-cell-role="th">sharpe_2bps</th>
+<th data-quarto-table-cell-role="th">sharpe_5bps</th>
+<th data-quarto-table-cell-role="th">breakeven_bps</th>
+<th data-quarto-table-cell-role="th">buy_and_hold_sharpe</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>IEUR</td>
+<td>MLP</td>
+<td>all</td>
+<td>92.53</td>
+<td>0.12</td>
+<td>-0.07</td>
+<td>-0.34</td>
+<td>1.29</td>
+<td>0.28</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>IEUR</td>
+<td>LSTM</td>
+<td>all</td>
+<td>41.61</td>
+<td>-0.12</td>
+<td>-0.21</td>
+<td>-0.33</td>
+<td>0.00</td>
+<td>0.28</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>IEUR</td>
+<td>MLP</td>
+<td>top10</td>
+<td>99.49</td>
+<td>0.04</td>
+<td>-0.16</td>
+<td>-0.44</td>
+<td>0.39</td>
+<td>0.28</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>IEUR</td>
+<td>LSTM</td>
+<td>top10</td>
+<td>107.23</td>
+<td>0.12</td>
+<td>-0.10</td>
+<td>-0.41</td>
+<td>1.08</td>
+<td>0.28</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>FEZ</td>
+<td>MLP</td>
+<td>all</td>
+<td>96.43</td>
+<td>0.01</td>
+<td>-0.18</td>
+<td>-0.44</td>
+<td>0.06</td>
+<td>0.17</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">5</th>
+<td>FEZ</td>
+<td>LSTM</td>
+<td>all</td>
+<td>33.77</td>
+<td>-0.17</td>
+<td>-0.24</td>
+<td>-0.33</td>
+<td>0.00</td>
+<td>0.17</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">6</th>
+<td>FEZ</td>
+<td>MLP</td>
+<td>top10</td>
+<td>98.45</td>
+<td>-0.12</td>
+<td>-0.30</td>
+<td>-0.56</td>
+<td>0.00</td>
+<td>0.17</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">7</th>
+<td>FEZ</td>
+<td>LSTM</td>
+<td>top10</td>
+<td>81.98</td>
+<td>0.23</td>
+<td>0.06</td>
+<td>-0.17</td>
+<td>2.81</td>
+<td>0.17</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">8</th>
+<td>EUFN</td>
+<td>MLP</td>
+<td>all</td>
+<td>90.64</td>
+<td>0.60</td>
+<td>0.43</td>
+<td>0.19</td>
+<td>7.47</td>
+<td>0.15</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">9</th>
+<td>EUFN</td>
+<td>LSTM</td>
+<td>all</td>
+<td>52.33</td>
+<td>-0.04</td>
+<td>-0.12</td>
+<td>-0.25</td>
+<td>0.00</td>
+<td>0.15</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">10</th>
+<td>EUFN</td>
+<td>MLP</td>
+<td>top10</td>
+<td>86.77</td>
+<td>0.54</td>
+<td>0.38</td>
+<td>0.15</td>
+<td>7.06</td>
+<td>0.15</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">11</th>
+<td>EUFN</td>
+<td>LSTM</td>
+<td>top10</td>
+<td>87.78</td>
+<td>0.11</td>
+<td>-0.04</td>
+<td>-0.25</td>
+<td>1.48</td>
+<td>0.15</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">12</th>
+<td>IVV</td>
+<td>MLP</td>
+<td>all</td>
+<td>81.73</td>
+<td>-0.26</td>
+<td>-0.43</td>
+<td>-0.69</td>
+<td>0.00</td>
+<td>0.66</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">13</th>
+<td>IVV</td>
+<td>LSTM</td>
+<td>all</td>
+<td>25.20</td>
+<td>0.30</td>
+<td>0.24</td>
+<td>0.15</td>
+<td>10.27</td>
+<td>0.66</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">14</th>
+<td>IVV</td>
+<td>MLP</td>
+<td>top10</td>
+<td>84.76</td>
+<td>-0.14</td>
+<td>-0.32</td>
+<td>-0.59</td>
+<td>0.00</td>
+<td>0.66</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">15</th>
+<td>IVV</td>
+<td>LSTM</td>
+<td>top10</td>
+<td>40.66</td>
+<td>0.28</td>
+<td>0.18</td>
+<td>0.04</td>
+<td>5.83</td>
+<td>0.66</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>At 5 bps per trade the EUFN MLP falls to buy-and-hold levels, and the only other run that beats buy-and-hold before costs (FEZ LSTM on the top-10 features) falls below it at 2 bps.</p>
 <hr>
 </section>
 </section>
@@ -3199,16 +3433,16 @@ fold k:  train = [0 : 750+(k-1)·120]  test = [750+(k-1)·120 : 750+k·120]</cod
 <p>Sagaceta-Mejía et al. (2024) report that training the MLP on the <strong>Selected(5)</strong> subset (≈5% of the ~216 Pandas TA indicators) improved median 10-fold accuracy by ~2 pp over the full feature set on ECH / EWZ / IVV. To stress-test that claim on our 2010-2026 European ETFs (plus IVV as a US benchmark), we re-ran the walk-forward harness on a much smaller input space: the <strong>top-10 features per ticker</strong> taken directly from each ticker’s <code>reports/results/&lt;TICKER&gt;_feature_importance.csv</code> ranking that the preprocessing team produced upstream.</p>
 <section id="selected-features-per-ticker" class="level3">
 <h3 class="anchored" data-anchor-id="selected-features-per-ticker">6.1 Selected features per ticker</h3>
-<div id="cell-top10-feature-list" class="cell" data-execution_count="7">
+<div id="cell-top10-feature-list" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>top10 <span class="op">=</span> {</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    t: pd.read_csv(RESULTS <span class="op">/</span> <span class="ss">f&quot;</span><span class="sc">{</span>t<span class="sc">}</span><span class="ss">_feature_importance.csv&quot;</span>)[<span class="st">&quot;feature&quot;</span>].head(<span class="dv">10</span>).tolist()</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> TICKERS</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>pd.DataFrame.from_dict(top10, orient<span class="op">=</span><span class="st">&quot;index&quot;</span>).T</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>top10 <span class="op">=</span> {</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    t: pd.read_csv(RESULTS <span class="op">/</span> <span class="ss">f&quot;</span><span class="sc">{</span>t<span class="sc">}</span><span class="ss">_feature_importance.csv&quot;</span>)[<span class="st">&quot;feature&quot;</span>].head(<span class="dv">10</span>).tolist()</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> TICKERS</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>pd.DataFrame.from_dict(top10, orient<span class="op">=</span><span class="st">&quot;index&quot;</span>).T</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div id="top10-feature-list" class="cell-output cell-output-display" data-execution_count="7">
+<div id="top10-feature-list" class="cell-output cell-output-display" data-execution_count="8">
 <div>
 
 
@@ -3299,24 +3533,24 @@ fold k:  train = [0 : 750+(k-1)·120]  test = [750+(k-1)·120 : 750+k·120]</cod
 </div>
 </div>
 </div>
-<p>Across all four tickers, the top of the ranking is dominated by <strong>Smart Money Concept</strong> indicators (<code>SMCtp</code>, <code>SMCbi</code>, <code>SMCbp</code>, <code>SMCti</code>) and a handful of the same features called out in the paper’s Selected(5) — <strong>BOP</strong>, <strong>BBP</strong> and (on EUFN/IVV) <strong>PVR</strong> — confirming that the importance ranking surfaces broadly similar signals to the paper’s statistical-measure pipeline.</p>
+<p>Across all four tickers, the top of the ranking is dominated by <strong>Smart Money Concept</strong> indicators (<code>SMCtp</code>, <code>SMCbi</code>, <code>SMCbp</code>, <code>SMCti</code>) and a handful of the same features called out in the paper’s Selected(5) — <strong>BOP</strong>, <strong>BBP</strong> and (on EUFN) <strong>PVR</strong> — confirming that the importance ranking surfaces broadly similar signals to the paper’s statistical-measure pipeline.</p>
 </section>
 <section id="reduced-set-walk-forward-results" class="level3">
 <h3 class="anchored" data-anchor-id="reduced-set-walk-forward-results">6.2 Reduced-set walk-forward results</h3>
-<div id="cell-load-top10-metrics" class="cell" data-execution_count="8">
+<div id="cell-load-top10-metrics" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>metrics_top10 <span class="op">=</span> {</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    t: pd.read_csv(RESULTS <span class="op">/</span> <span class="ss">f&quot;</span><span class="sc">{</span>t<span class="sc">}</span><span class="ss">_walkforward_metrics_top10.csv&quot;</span>, index_col<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> TICKERS</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>pd.concat(</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    {t: m[[<span class="st">&quot;total_return&quot;</span>, <span class="st">&quot;annual_return&quot;</span>, <span class="st">&quot;sharpe&quot;</span>, <span class="st">&quot;max_drawdown&quot;</span>, <span class="st">&quot;hit_rate&quot;</span>]]</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>     <span class="cf">for</span> t, m <span class="kw">in</span> metrics_top10.items()},</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    names<span class="op">=</span>[<span class="st">&quot;ticker&quot;</span>],</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>).<span class="bu">round</span>(<span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>metrics_top10 <span class="op">=</span> {</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    t: pd.read_csv(RESULTS <span class="op">/</span> <span class="ss">f&quot;</span><span class="sc">{</span>t<span class="sc">}</span><span class="ss">_walkforward_metrics_top10.csv&quot;</span>, index_col<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> TICKERS</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>pd.concat(</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    {t: m[[<span class="st">&quot;total_return&quot;</span>, <span class="st">&quot;annual_return&quot;</span>, <span class="st">&quot;sharpe&quot;</span>, <span class="st">&quot;max_drawdown&quot;</span>, <span class="st">&quot;hit_rate&quot;</span>]]</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>     <span class="cf">for</span> t, m <span class="kw">in</span> metrics_top10.items()},</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    names<span class="op">=</span>[<span class="st">&quot;ticker&quot;</span>],</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>).<span class="bu">round</span>(<span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div id="load-top10-metrics" class="cell-output cell-output-display" data-execution_count="8">
+<div id="load-top10-metrics" class="cell-output cell-output-display" data-execution_count="9">
 <div>
 
 
@@ -3528,27 +3762,27 @@ fold k:  train = [0 : 750+(k-1)·120]  test = [750+(k-1)·120 : 750+k·120]</cod
 </section>
 <section id="head-to-head-full-features-vs-top-10" class="level3">
 <h3 class="anchored" data-anchor-id="head-to-head-full-features-vs-top-10">6.3 Head-to-head: full features vs top-10</h3>
-<div id="cell-full-vs-top10" class="cell" data-execution_count="9">
+<div id="cell-full-vs-top10" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _delta(full: pd.DataFrame, top: pd.DataFrame, model: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Sharpe (full)&quot;</span>:  full.loc[model, <span class="st">&quot;sharpe&quot;</span>],</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Sharpe (top10)&quot;</span>: top.loc[model, <span class="st">&quot;sharpe&quot;</span>],</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Δ Sharpe&quot;</span>:       top.loc[model, <span class="st">&quot;sharpe&quot;</span>] <span class="op">-</span> full.loc[model, <span class="st">&quot;sharpe&quot;</span>],</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Total ret (full)&quot;</span>:  full.loc[model, <span class="st">&quot;total_return&quot;</span>],</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Total ret (top10)&quot;</span>: top.loc[model, <span class="st">&quot;total_return&quot;</span>],</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> TICKERS:</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> model <span class="kw">in</span> [<span class="st">&quot;MLP&quot;</span>, <span class="st">&quot;LSTM&quot;</span>]:</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>        row <span class="op">=</span> {<span class="st">&quot;ticker&quot;</span>: t, <span class="st">&quot;model&quot;</span>: model,</span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>               <span class="op">**</span>_delta(metrics_all[t], metrics_top10[t], model)}</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>        rows.append(row)</span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(rows).set_index([<span class="st">&quot;ticker&quot;</span>, <span class="st">&quot;model&quot;</span>]).<span class="bu">round</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _delta(full: pd.DataFrame, top: pd.DataFrame, model: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Sharpe (full)&quot;</span>:  full.loc[model, <span class="st">&quot;sharpe&quot;</span>],</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Sharpe (top10)&quot;</span>: top.loc[model, <span class="st">&quot;sharpe&quot;</span>],</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Δ Sharpe&quot;</span>:       top.loc[model, <span class="st">&quot;sharpe&quot;</span>] <span class="op">-</span> full.loc[model, <span class="st">&quot;sharpe&quot;</span>],</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Total ret (full)&quot;</span>:  full.loc[model, <span class="st">&quot;total_return&quot;</span>],</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Total ret (top10)&quot;</span>: top.loc[model, <span class="st">&quot;total_return&quot;</span>],</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> TICKERS:</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> model <span class="kw">in</span> [<span class="st">&quot;MLP&quot;</span>, <span class="st">&quot;LSTM&quot;</span>]:</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>        row <span class="op">=</span> {<span class="st">&quot;ticker&quot;</span>: t, <span class="st">&quot;model&quot;</span>: model,</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>               <span class="op">**</span>_delta(metrics_all[t], metrics_top10[t], model)}</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>        rows.append(row)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(rows).set_index([<span class="st">&quot;ticker&quot;</span>, <span class="st">&quot;model&quot;</span>]).<span class="bu">round</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div id="full-vs-top10" class="cell-output cell-output-display" data-execution_count="9">
+<div id="full-vs-top10" class="cell-output cell-output-display" data-execution_count="10">
 <div>
 
 
@@ -3649,43 +3883,44 @@ fold k:  train = [0 : 750+(k-1)·120]  test = [750+(k-1)·120 : 750+k·120]</cod
 </div>
 </div>
 </section>
-<section id="interpretation-why-our-result-diverges-from-the-paper" class="level3">
-<h3 class="anchored" data-anchor-id="interpretation-why-our-result-diverges-from-the-paper">6.4 Interpretation — why our result diverges from the paper</h3>
-<p>The table makes the contrast unambiguous: <strong>on this dataset and with this validation protocol, the full feature set wins for every ticker/model combination on a Sharpe basis.</strong> The drop is dramatic on the cases where the full-feature model genuinely had an edge:</p>
+<section id="interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="interpretation">6.4 Interpretation</h3>
+<p>Pruning to ten features does not have one consistent effect:</p>
 <ul>
-<li><strong>EUFN</strong> (LSTM): Sharpe collapses from <strong>1.55 → −0.17</strong>; the ~29× total return becomes a small loss.</li>
-<li><strong>FEZ</strong> (LSTM): Sharpe drops from <strong>1.67 → 0.20</strong> and the strategy no longer beats buy-and-hold.</li>
-<li><strong>EUFN</strong> (MLP): Sharpe drops from 0.94 → 0.44 but the model still beats buy-and-hold.</li>
-<li><strong>IEUR</strong> and <strong>IVV</strong>: both models were already losing to buy-and-hold on the full set, and they continue to do so under the reduced set (slightly worse).</li>
+<li><strong>MLP:</strong> the full feature set is better on three of four tickers (EUFN 0.60 → 0.54, FEZ 0.01 → −0.12, IEUR 0.12 → 0.04); only IVV improves (−0.26 → −0.14), and it stays negative.</li>
+<li><strong>LSTM:</strong> the top-10 set is better on three of four tickers (EUFN −0.04 → 0.11, FEZ −0.17 → 0.23, IEUR −0.12 → 0.12) and roughly neutral on IVV (0.30 → 0.28).</li>
 </ul>
-<p>This is the <em>opposite</em> sign to the paper’s headline finding. A few mechanical reasons our setup is unlikely to reproduce a ~2 pp accuracy gain from aggressive feature pruning:</p>
+<p>So the paper’s finding that a small feature subset helps the MLP does not carry over to our setup, while the LSTM does benefit from fewer inputs. A few reasons the results differ from the paper:</p>
 <ol type="1">
-<li><strong>Different validation protocol.</strong> The paper uses <strong>10-fold shuffled <code>StratifiedKFold</code></strong> (an i.i.d. assumption), which lets the MLP see future-dated rows during training. We use a strict <strong>expanding-window walk-forward</strong>, so every test row is genuinely out-of-sample. Shuffled CV scores on price series are well-known to be optimistically biased — and feature subsets that look good under shuffled CV often lose their edge under temporal validation.</li>
-<li><strong>Different feature pool.</strong> The paper has 216 Pandas TA columns; our pipeline produces ~260 (different Pandas TA version, plus the SMC family that dominates the importance ranking). The “top of the importance list” is therefore a different set of signals.</li>
-<li><strong>Different downstream task on the LSTM.</strong> The paper’s feature-selection result was reported for the MLP only. Our LSTM regresses next-day price, and a 10-feature LSTM has noticeably less to chew on per timestep — collapsing the model’s ability to identify price dynamics. The LSTM is where we see the largest Sharpe loss when features are stripped.</li>
-<li><strong>Different dataset window.</strong> The paper deliberately ends in 2020-01 to exclude the COVID period; our backtest covers 2012-2026 including the 2020 shock, the 2022 rate cycle, and 2023-25 recovery — regimes where the wider feature set has more distinct signals to lean on.</li>
+<li><strong>Different validation protocol.</strong> The paper uses <strong>10-fold shuffled <code>StratifiedKFold</code></strong> (an i.i.d. assumption), which lets the MLP see future-dated rows during training. We use a strict <strong>expanding-window walk-forward</strong>, so every test row is genuinely out-of-sample. Shuffled CV scores on price series are well-known to be optimistically biased, and feature subsets that look good under shuffled CV often lose their edge under temporal validation.</li>
+<li><strong>Different feature pool.</strong> The paper has 216 Pandas TA columns; our pipeline produces about 250 (a different Pandas TA version, plus the SMC family that dominates the importance ranking). The top of the importance list is therefore a different set of signals.</li>
+<li><strong>Model capacity.</strong> With about 250 features in each of 20 time steps and a few thousand training rows, the full-feature LSTM has far more inputs than the data can support, so cutting to ten features acts as regularisation. The MLP sees a single day at a time and is less exposed to this.</li>
+<li><strong>Different dataset window.</strong> The paper deliberately ends in 2020-01 to exclude the COVID period; our backtest covers 2014-2026, including the 2020 shock, the 2022 rate cycle and the 2023-25 recovery.</li>
 </ol>
-<p>The practical lesson is that <strong>for our walk-forward backtest, the extra ~250 features are <em>not</em> redundant</strong> — they materially help the model handle regime shifts. Reducing to a handful of features only makes sense if (a) we can re-tune model capacity and (b) we accept a much smoother but lower-Sharpe equity curve. A middle-ground experiment (e.g. top 30–60 features, possibly with category quotas matching the paper’s Selected(5) distribution) is the natural next step.</p>
+<p>Given how close most of these Sharpe ratios are to zero, and that each model is trained with a single seed, the differences between feature sets are small relative to the noise. A middle-ground experiment (for example the top 30 to 60 features, retrained over several seeds) is the natural next step.</p>
 <hr>
 </section>
 </section>
 <section id="reproducing-the-results" class="level2">
 <h2 class="anchored" data-anchor-id="reproducing-the-results">7. Reproducing the results</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># from the project root — full feature baseline</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHONPATH</span><span class="op">=</span>src <span class="ex">python</span> scripts/run_modeling.py</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># or simply</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> modeling</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># top-10 features per ticker (suffix keeps the baseline files intact)</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHONPATH</span><span class="op">=</span>src <span class="ex">python</span> scripts/run_modeling.py <span class="dt">\</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">--top-k-features</span> 10 <span class="at">--feature-suffix</span> _top10</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># from the project root — full feature baseline</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHONPATH</span><span class="op">=</span>src <span class="ex">python</span> scripts/run_modeling.py</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># or simply</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> modeling</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># top-10 features per ticker (suffix keeps the baseline files intact)</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHONPATH</span><span class="op">=</span>src <span class="ex">python</span> scripts/run_modeling.py <span class="dt">\</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">--top-k-features</span> 10 <span class="at">--feature-suffix</span> _top10</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Sharpe ratios net of transaction costs for every saved run</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHONPATH</span><span class="op">=</span>src <span class="ex">python</span> scripts/cost_sensitivity.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Useful CLI flags:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Smoke test — 3 folds only</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHONPATH</span><span class="op">=</span>src <span class="ex">python</span> scripts/run_modeling.py <span class="at">--max-folds</span> 3</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Train a single ticker with custom epochs / look-back</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHONPATH</span><span class="op">=</span>src <span class="ex">python</span> scripts/run_modeling.py <span class="dt">\</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">--tickers</span> FEZ <span class="at">--mlp-epochs</span> 50 <span class="at">--lstm-epochs</span> 30 <span class="at">--lstm-seq-len</span> 30</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Smoke test — 3 folds only</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHONPATH</span><span class="op">=</span>src <span class="ex">python</span> scripts/run_modeling.py <span class="at">--max-folds</span> 3</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Train a single ticker with custom epochs / look-back</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHONPATH</span><span class="op">=</span>src <span class="ex">python</span> scripts/run_modeling.py <span class="dt">\</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">--tickers</span> FEZ <span class="at">--mlp-epochs</span> 50 <span class="at">--lstm-epochs</span> 30 <span class="at">--lstm-seq-len</span> 30</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Each run regenerates (with optional <code>&lt;suffix&gt;</code> from <code>--feature-suffix</code>):</p>
 <ul>
 <li><code>reports/figures/equity_&lt;TICKER&gt;&lt;suffix&gt;.png</code></li>
@@ -3700,9 +3935,11 @@ fold k:  train = [0 : 750+(k-1)·120]  test = [750+(k-1)·120 : 750+k·120]</cod
 <section id="limitations-next-steps" class="level2">
 <h2 class="anchored" data-anchor-id="limitations-next-steps">8. Limitations &amp; next steps</h2>
 <ul>
-<li><strong>Transaction costs and slippage are not modeled.</strong> With a daily ±1 signal that frequently flips, real-world fills and the bid/ask spread would erode a meaningful slice of the reported Sharpe — most aggressively on the LSTM’s higher-turnover folds.</li>
-<li><strong>Position sizing is binary.</strong> A confidence-weighted sizing scheme (e.g. scaling by predicted probability or predicted return magnitude) would likely smooth the equity curves and improve risk-adjusted returns.</li>
-<li><strong>No hyper-parameter search.</strong> Architecture sizes, epoch counts, dropout, and sequence length are fixed at sensible defaults. A walk-forward-aware tuning loop (e.g. nested CV on the training block) would be the natural next step.</li>
+<li><strong>Simple cost model.</strong> Trading costs are a flat charge per unit traded (section 5.6). Borrowing costs for the short side, the bid/ask spread at the open and market impact are not modelled.</li>
+<li><strong>Same-day training label for the MLP.</strong> Following the paper, the MLP learns Γ(t), which is already known by the close of day <em>t</em>, while its signal trades the following day’s return. Training on a next-day target would match what the model learns to what it trades.</li>
+<li><strong>One seed per model.</strong> Each network is trained with a single fixed seed, so the spread of these Sharpe ratios across training runs is unknown.</li>
+<li><strong>Position sizing is binary.</strong> A confidence-weighted sizing scheme (scaling by predicted probability or predicted return magnitude) would likely smooth the equity curves.</li>
+<li><strong>No hyper-parameter search.</strong> Architecture sizes, epoch counts, dropout and sequence length are fixed at sensible defaults. A walk-forward-aware tuning loop (e.g. nested validation on the training block) would be the natural next step.</li>
 </ul>
 <hr>
 </section>
