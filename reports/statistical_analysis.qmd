@@ -1,8 +1,11 @@
 ---
 title: "Statistical Diagnostics and Time-Series Baseline"
-format: 
+format:
   html:
-    self-contained: true
+    theme:
+      dark: darkly
+      light: cosmo
+    embed-resources: true
 execute:
   echo: false
   warning: false
