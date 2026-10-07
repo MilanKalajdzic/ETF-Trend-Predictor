@@ -1,17 +1,29 @@
 ---
 title: "ETF Trend Prediction — Modeling Report"
 subtitle: "MLP signal classifier and LSTM value regressor on ETFs"
-author: Max
+author: Milan Kalajdzic
 date: today
 format:
   html:
     toc: true
     toc-depth: 3
     code-fold: true
-    theme: cosmo
+    theme:
+      dark: darkly
+      light: cosmo
     fig-width: 10
     fig-height: 5
     embed-resources: true
+    include-in-header:
+      text: |
+        <style>
+          /* The figures are saved with a white background. In dark mode,
+             invert their lightness and rotate the hue back so the series
+             keep their colours on the dark page. */
+          body.quarto-dark .figure-img {
+            filter: invert(0.865) hue-rotate(180deg);
+          }
+        </style>
 execute:
   warning: false
   echo: true
