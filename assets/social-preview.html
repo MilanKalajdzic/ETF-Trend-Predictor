@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ETF Trend Predictor social preview</title>
+<!--
+  Source for assets/social-preview.png (GitHub social preview, 1280x640).
+  To regenerate: open in a browser at 1280x640 and screenshot, or render
+  headless, e.g. with Playwright:
+    page.set_viewport_size({"width": 1280, "height": 640})
+    page.screenshot(path="assets/social-preview.png")
+  The candlesticks are illustrative, not real ETF data.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; background: #0F1214; }
+  .card { width: 1280px; height: 640px; box-sizing: border-box; padding: 64px 72px; background: #0F1214; color: #ECEEF0; font-family: 'Archivo', sans-serif; display: flex; gap: 56px; align-items: stretch; overflow: hidden; }
+  .left { width: 560px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; }
+  .top { display: flex; flex-direction: column; gap: 22px; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .eyebrow { font-size: 14px; font-weight: 500; letter-spacing: 0.14em; color: #8B95A1; }
+  h1 { margin: 0; font-size: 86px; line-height: 0.95; font-weight: 800; letter-spacing: -0.02em; }
+  h1 span { color: #4FD1A5; }
+  .lede { margin: 0; font-size: 22px; line-height: 1.4; color: #A7B0BA; max-width: 560px; }
+  .tickers { display: flex; gap: 10px; align-items: center; font-size: 16px; font-weight: 700; }
+  .chip { padding: 7px 14px; border-radius: 6px; background: #1A2026; border: 1px solid #2A323A; }
+  .vs { padding: 7px 4px; color: #8B95A1; font-weight: 500; }
+  .bottom { display: flex; flex-direction: column; gap: 18px; }
+  .stats { display: flex; gap: 40px; }
+  .stat { display: flex; flex-direction: column; gap: 4px; }
+  .stat b { font-size: 30px; font-weight: 800; }
+  .stat small { font-size: 15px; color: #8B95A1; }
+  .stack { font-size: 14px; color: #6F7984; }
+  .right { flex-grow: 1; min-width: 0; display: flex; align-items: center; }
+  .panel { width: 100%; box-sizing: border-box; padding: 26px 24px 22px; border-radius: 14px; background: #13181C; border: 1px solid #222A31; display: flex; flex-direction: column; gap: 14px; }
+  .panel-head { display: flex; justify-content: space-between; align-items: center; font-size: 13px; letter-spacing: 0.08em; color: #8B95A1; }
+  .legend { display: flex; gap: 16px; align-items: center; }
+  .legend span { display: flex; gap: 6px; align-items: center; }
+  .sw { width: 10px; height: 10px; border-radius: 2px; }
+  .panel-foot { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #A7B0BA; }
+  .panel-foot span:last-child { color: #6F7984; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="left">
+    <div class="top">
+      <div class="mono eyebrow">QUANT FINANCE  /  ML  /  REPRODUCIBLE RESEARCH</div>
+      <h1>ETF Trend<br><span>Predictor</span></h1>
+      <p class="lede">Forecasting next-day direction of European ETFs from 260+ technical indicators and a neural network.</p>
+      <div class="mono tickers">
+        <span class="chip">IEUR</span>
+        <span class="chip">FEZ</span>
+        <span class="chip">EUFN</span>
+        <span class="vs">vs IVV benchmark</span>
+      </div>
+    </div>
+    <div class="bottom">
+      <div class="stats">
+        <div class="stat"><b>260+</b><small>technical indicators</small></div>
+        <div class="stat"><b>2010 to 2026</b><small>daily market data</small></div>
+        <div class="stat"><b>Docker</b><small>reproducible end to end</small></div>
+      </div>
+      <div class="mono stack">Python · pandas-ta · Docker · Quarto · Sphinx</div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="panel">
+      <div class="mono panel-head">
+        <span>DAILY OHLC</span>
+        <span class="legend">
+          <span><span class="sw" style="background:#4FD1A5"></span>UP</span>
+          <span><span class="sw" style="background:#F0894B"></span>DOWN</span>
+        </span>
+      </div>
+      <svg viewBox="0 0 520 330" width="100%" style="display:block" aria-hidden="true">
+        <line x1="0" y1="80" x2="520" y2="80" stroke="#1E252C"/>
+        <line x1="0" y1="160" x2="520" y2="160" stroke="#1E252C"/>
+        <line x1="0" y1="240" x2="520" y2="240" stroke="#1E252C"/>
+        <line x1="10.0" y1="48.1" x2="10.0" y2="62.7" stroke="#4FD1A5" stroke-width="1.5"/><rect x="4.5" y="57.7" width="11" height="2.0" rx="1.5" fill="#4FD1A5"/>
+        <line x1="30.0" y1="56.0" x2="30.0" y2="105.7" stroke="#F0894B" stroke-width="1.5"/><rect x="24.5" y="60.1" width="11" height="24.7" rx="1.5" fill="#F0894B"/>
+        <line x1="50.0" y1="27.4" x2="50.0" y2="89.0" stroke="#4FD1A5" stroke-width="1.5"/><rect x="44.5" y="32.1" width="11" height="49.4" rx="1.5" fill="#4FD1A5"/>
+        <line x1="70.0" y1="14.6" x2="70.0" y2="92.6" stroke="#F0894B" stroke-width="1.5"/><rect x="64.5" y="30.7" width="11" height="52.4" rx="1.5" fill="#F0894B"/>
+        <line x1="90.0" y1="46.5" x2="90.0" y2="149.4" stroke="#F0894B" stroke-width="1.5"/><rect x="84.5" y="79.4" width="11" height="53.3" rx="1.5" fill="#F0894B"/>
+        <line x1="110.0" y1="113.5" x2="110.0" y2="146.0" stroke="#4FD1A5" stroke-width="1.5"/><rect x="104.5" y="114.4" width="11" height="21.9" rx="1.5" fill="#4FD1A5"/>
+        <line x1="130.0" y1="89.8" x2="130.0" y2="131.6" stroke="#4FD1A5" stroke-width="1.5"/><rect x="124.5" y="97.2" width="11" height="22.0" rx="1.5" fill="#4FD1A5"/>
+        <line x1="150.0" y1="30.4" x2="150.0" y2="96.0" stroke="#4FD1A5" stroke-width="1.5"/><rect x="144.5" y="53.0" width="11" height="31.3" rx="1.5" fill="#4FD1A5"/>
+        <line x1="170.0" y1="56.5" x2="170.0" y2="73.0" stroke="#F0894B" stroke-width="1.5"/><rect x="164.5" y="58.5" width="11" height="2.6" rx="1.5" fill="#F0894B"/>
+        <line x1="190.0" y1="41.2" x2="190.0" y2="75.6" stroke="#F0894B" stroke-width="1.5"/><rect x="184.5" y="59.3" width="11" height="6.5" rx="1.5" fill="#F0894B"/>
+        <line x1="210.0" y1="51.9" x2="210.0" y2="84.7" stroke="#F0894B" stroke-width="1.5"/><rect x="204.5" y="56.6" width="11" height="20.1" rx="1.5" fill="#F0894B"/>
+        <line x1="230.0" y1="51.1" x2="230.0" y2="125.8" stroke="#4FD1A5" stroke-width="1.5"/><rect x="224.5" y="75.7" width="11" height="12.2" rx="1.5" fill="#4FD1A5"/>
+        <line x1="250.0" y1="56.3" x2="250.0" y2="87.5" stroke="#4FD1A5" stroke-width="1.5"/><rect x="244.5" y="71.7" width="11" height="6.4" rx="1.5" fill="#4FD1A5"/>
+        <line x1="270.0" y1="56.6" x2="270.0" y2="129.6" stroke="#F0894B" stroke-width="1.5"/><rect x="264.5" y="72.2" width="11" height="44.8" rx="1.5" fill="#F0894B"/>
+        <line x1="290.0" y1="38.4" x2="290.0" y2="112.1" stroke="#4FD1A5" stroke-width="1.5"/><rect x="284.5" y="45.3" width="11" height="64.6" rx="1.5" fill="#4FD1A5"/>
+        <line x1="310.0" y1="10.0" x2="310.0" y2="63.6" stroke="#4FD1A5" stroke-width="1.5"/><rect x="304.5" y="21.5" width="11" height="33.5" rx="1.5" fill="#4FD1A5"/>
+        <line x1="330.0" y1="21.0" x2="330.0" y2="81.4" stroke="#F0894B" stroke-width="1.5"/><rect x="324.5" y="31.0" width="11" height="26.1" rx="1.5" fill="#F0894B"/>
+        <line x1="350.0" y1="67.9" x2="350.0" y2="144.2" stroke="#F0894B" stroke-width="1.5"/><rect x="344.5" y="72.4" width="11" height="44.5" rx="1.5" fill="#F0894B"/>
+        <line x1="370.0" y1="65.2" x2="370.0" y2="180.5" stroke="#F0894B" stroke-width="1.5"/><rect x="364.5" y="112.6" width="11" height="61.2" rx="1.5" fill="#F0894B"/>
+        <line x1="390.0" y1="161.0" x2="390.0" y2="231.9" stroke="#F0894B" stroke-width="1.5"/><rect x="384.5" y="179.4" width="11" height="31.8" rx="1.5" fill="#F0894B"/>
+        <line x1="410.0" y1="182.2" x2="410.0" y2="240.0" stroke="#4FD1A5" stroke-width="1.5"/><rect x="404.5" y="190.4" width="11" height="19.6" rx="1.5" fill="#4FD1A5"/>
+        <line x1="430.0" y1="145.5" x2="430.0" y2="215.2" stroke="#4FD1A5" stroke-width="1.5"/><rect x="424.5" y="155.8" width="11" height="29.9" rx="1.5" fill="#4FD1A5"/>
+        <line x1="450.0" y1="89.9" x2="450.0" y2="183.3" stroke="#4FD1A5" stroke-width="1.5"/><rect x="444.5" y="99.8" width="11" height="46.3" rx="1.5" fill="#4FD1A5"/>
+        <line x1="470.0" y1="28.4" x2="470.0" y2="108.1" stroke="#4FD1A5" stroke-width="1.5"/><rect x="464.5" y="62.5" width="11" height="42.1" rx="1.5" fill="#4FD1A5"/>
+        <line x1="490.0" y1="24.5" x2="490.0" y2="104.3" stroke="#F0894B" stroke-width="1.5"/><rect x="484.5" y="54.9" width="11" height="39.0" rx="1.5" fill="#F0894B"/>
+        <line x1="510.0" y1="60.2" x2="510.0" y2="97.3" stroke="#4FD1A5" stroke-width="1.5"/><rect x="504.5" y="72.4" width="11" height="22.6" rx="1.5" fill="#4FD1A5"/>
+        <line x1="0" y1="300" x2="520" y2="300" stroke="#3A444E"/>
+        <g opacity="0.85">
+          <rect x="26" y="302" width="8" height="20" rx="1" fill="#F0894B"/>
+          <rect x="46" y="302" width="8" height="20" rx="1" fill="#F0894B"/>
+          <rect x="66" y="278" width="8" height="20" rx="1" fill="#4FD1A5"/>
+          <rect x="86" y="302" width="8" height="20" rx="1" fill="#F0894B"/>
+          <rect x="106" y="302" width="8" height="20" rx="1" fill="#F0894B"/>
+          <rect x="126" y="278" width="8" height="20" rx="1" fill="#4FD1A5"/>
+          <rect x="146" y="278" width="8" height="20" rx="1" fill="#4FD1A5"/>
+          <rect x="166" y="278" width="8" height="20" rx="1" fill="#4FD1A5"/>
+          <rect x="186" y="302" width="8" height="20" rx="1" fill="#F0894B"/>
+          <rect x="206" y="278" width="8" height="20" rx="1" fill="#4FD1A5"/>
+          <rect x="226" y="302" width="8" height="20" rx="1" fill="#F0894B"/>
+          <rect x="246" y="278" width="8" height="20" rx="1" fill="#4FD1A5"/>
+          <rect x="266" y="278" width="8" height="20" rx="1" fill="#4FD1A5"/>
+          <rect x="286" y="302" width="8" height="20" rx="1" fill="#F0894B"/>
+          <rect x="306" y="278" width="8" height="20" rx="1" fill="#4FD1A5"/>
+          <rect x="326" y="278" width="8" height="20" rx="1" fill="#4FD1A5"/>
+          <rect x="346" y="302" width="8" height="20" rx="1" fill="#F0894B"/>
+          <rect x="366" y="302" width="8" height="20" rx="1" fill="#F0894B"/>
+          <rect x="386" y="302" width="8" height="20" rx="1" fill="#F0894B"/>
+          <rect x="406" y="302" width="8" height="20" rx="1" fill="#F0894B"/>
+          <rect x="426" y="278" width="8" height="20" rx="1" fill="#4FD1A5"/>
+          <rect x="446" y="278" width="8" height="20" rx="1" fill="#4FD1A5"/>
+          <rect x="466" y="278" width="8" height="20" rx="1" fill="#4FD1A5"/>
+          <rect x="486" y="278" width="8" height="20" rx="1" fill="#4FD1A5"/>
+          <rect x="506" y="302" width="8" height="20" rx="1" fill="#F0894B"/>
+        </g>
+      </svg>
+      <div class="mono panel-foot">
+        <span>Γ(t) = +1 if Open(t) &gt; Open(t−1), else −1</span>
+        <span>signal</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
