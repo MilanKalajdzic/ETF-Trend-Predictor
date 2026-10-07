@@ -1,7 +1,4 @@
-"""
-walk_forward.py
----------------
-Expanding-window walk-forward validation for the MLP and LSTM models.
+"""Expanding-window walk-forward validation for the MLP and LSTM models.
 
 Each fold:
     1. Re-fits the supplied model on the train slice.
@@ -13,8 +10,8 @@ Each fold:
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, Optional
 
 import numpy as np
 import pandas as pd
@@ -40,6 +37,7 @@ class WalkForwardResult:
         "mean_return", "sharpe"]``.
     model_name : str
         Identifier of the model that produced these results.
+
     """
 
     predictions: pd.DataFrame
@@ -73,13 +71,14 @@ class WalkForwardValidator:
       (features in [0, 1] plus the ``Gamma`` column).
     - ``close_unscaled``: the raw ``Close`` series in price units, used
       for the LSTM's return target and for computing strategy returns.
+
     """
 
     def __init__(
         self,
         initial_train_size: int,
         test_size: int,
-        max_folds: Optional[int] = None,
+        max_folds: int | None = None,
         price_col: str = "Close",
         target_col: str = "Gamma",
     ) -> None:
@@ -101,7 +100,7 @@ class WalkForwardValidator:
         self,
         df_scaled: pd.DataFrame,
         close_unscaled: pd.Series,
-        model_factory: Optional[Callable[[], MLPSignalModel]] = None,
+        model_factory: Callable[[], MLPSignalModel] | None = None,
     ) -> WalkForwardResult:
         """Run walk-forward validation for the MLP signal model.
 
@@ -114,6 +113,7 @@ class WalkForwardValidator:
         model_factory : callable
             Returns a fresh ``MLPSignalModel`` per fold. Defaults to
             ``MLPSignalModel()`` with library defaults.
+
         """
         if self.target_col not in df_scaled.columns:
             raise KeyError(
@@ -137,7 +137,7 @@ class WalkForwardValidator:
         self,
         df_scaled: pd.DataFrame,
         close_unscaled: pd.Series,
-        model_factory: Optional[Callable[[], LSTMValueModel]] = None,
+        model_factory: Callable[[], LSTMValueModel] | None = None,
     ) -> WalkForwardResult:
         """Run walk-forward validation for the LSTM value model.
 
@@ -149,6 +149,7 @@ class WalkForwardValidator:
             Unscaled close price aligned with ``df_scaled.index``.
         model_factory : callable
             Returns a fresh ``LSTMValueModel`` per fold.
+
         """
         factory = model_factory or (lambda: LSTMValueModel())
         feature_cols = [c for c in df_scaled.columns if c != self.target_col]

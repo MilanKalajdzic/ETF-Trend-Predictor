@@ -1,7 +1,7 @@
-"""
-Train the MLP signal model and the LSTM value model on every ETF in the
-processed dataset, evaluate both with expanding-window walk-forward
-validation
+"""Train and backtest the MLP and LSTM models on every ETF.
+
+Both models are evaluated on the processed dataset with expanding-window
+walk-forward validation. Outputs:
 
     reports/figures/equity_<TICKER>.png            equity-curve comparison
     reports/figures/fold_accuracy_<TICKER>.png     per-fold accuracy bars
@@ -45,6 +45,7 @@ RESULTS_DIR = Path("reports/results")
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse command-line arguments."""
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument(
         "--initial-train", type=int, default=750,
@@ -175,6 +176,7 @@ def load_unscaled_close(ticker: str, index: pd.Index) -> pd.Series:
 
 
 def run_one(ticker: str, df: pd.DataFrame, args: argparse.Namespace) -> None:
+    """Run both walk-forward backtests for one ticker and save the results."""
     logger.info("===== %s =====", ticker)
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -201,11 +203,14 @@ def run_one(ticker: str, df: pd.DataFrame, args: argparse.Namespace) -> None:
         max_folds=args.max_folds,
     )
 
-    mlp_factory = lambda: MLPSignalModel(epochs=args.mlp_epochs)
-    lstm_factory = lambda: LSTMValueModel(
-        epochs=args.lstm_epochs,
-        sequence_length=args.lstm_seq_len,
-    )
+    def mlp_factory() -> MLPSignalModel:
+        return MLPSignalModel(epochs=args.mlp_epochs)
+
+    def lstm_factory() -> LSTMValueModel:
+        return LSTMValueModel(
+            epochs=args.lstm_epochs,
+            sequence_length=args.lstm_seq_len,
+        )
 
     logger.info("[%s] Running MLP walk-forward …", ticker)
     mlp_result = validator.run_mlp(df, close_unscaled, model_factory=mlp_factory)
@@ -250,6 +255,7 @@ def run_one(ticker: str, df: pd.DataFrame, args: argparse.Namespace) -> None:
 
 
 def main() -> None:
+    """Run the walk-forward backtests for every processed ticker."""
     args = parse_args()
     datasets = load_processed_or_run_pipeline(args.tickers)
     for ticker, df in datasets.items():

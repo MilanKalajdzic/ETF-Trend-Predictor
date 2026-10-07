@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white" alt="Python 3.12">
   <img src="https://img.shields.io/badge/PyTorch-CPU-EE4C2C?logo=pytorch&logoColor=white" alt="PyTorch">
   <img src="https://img.shields.io/badge/reports-Quarto-75AADB?logo=quarto&logoColor=white" alt="Quarto reports">
-  <img src="https://img.shields.io/badge/tests-59%20unit%20tests-0A9EDC?logo=pytest&logoColor=white" alt="59 unit tests">
+  <a href="https://github.com/MilanKalajdzic/ETF-Trend-Predictor/actions/workflows/ci.yml"><img src="https://github.com/MilanKalajdzic/ETF-Trend-Predictor/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff"></a>
 </p>
 
@@ -41,7 +41,7 @@
 | **Models** | MLP signal classifier and LSTM next-day return regressor (PyTorch) |
 | **Validation** | Expanding-window walk-forward, 16 to 25 six-month folds per ticker, benchmarked against buy-and-hold |
 | **Baselines** | Random Forest feature importance, ADF stationarity tests, ARIMA(1,1,1) |
-| **Reproducibility** | One Docker image, Makefile automation, 59 unit tests, Sphinx API docs |
+| **Reproducibility** | One Docker image, Makefile automation, 60 unit tests (73% coverage) run in CI, Sphinx API docs |
 
 ---
 
@@ -180,6 +180,8 @@ Inside the container:
 | `make coverage` | Tests with an HTML coverage report |
 | `make docs` | Build the Sphinx HTML docs to `docs/_build/html/` |
 | `make lint` / `make format` | Ruff linter and formatter |
+
+Every push and pull request runs Ruff and the full test suite on GitHub Actions ([`ci.yml`](.github/workflows/ci.yml)).
 
 </details>
 

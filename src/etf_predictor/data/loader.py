@@ -1,8 +1,4 @@
-"""
-loader.py
----------
-Handles downloading and caching of raw OHLCV data from Yahoo Finance.
-"""
+"""Download and cache raw OHLCV data from Yahoo Finance."""
 
 from __future__ import annotations
 
@@ -50,6 +46,7 @@ class YahooFinanceLoader:
     ... )
     >>> raw_data = loader.load()
     >>> raw_data["IEUR"].head()
+
     """
 
     def __init__(
@@ -86,6 +83,7 @@ class YahooFinanceLoader:
             Mapping of ticker symbol → DataFrame with columns
             ``["Open", "High", "Low", "Close", "Adj Close", "Volume"]``
             and a ``DatetimeIndex``.
+
         """
         result: dict[str, pd.DataFrame] = {}
         for ticker in self.tickers:
@@ -119,6 +117,7 @@ class YahooFinanceLoader:
         -------
         pd.DataFrame or None
             OHLCV DataFrame or ``None`` if the download failed.
+
         """
         path = self._cache_path(ticker)
         if path.exists() and not force_download:

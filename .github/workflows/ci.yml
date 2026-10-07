@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install Ruff
+        run: pip install ruff==0.16.8
+
+      - name: Ruff
+        run: ruff check src tests scripts
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install CPU-only PyTorch
+        run: pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Install package
+        run: pip install -e ".[dev]"
+
+      - name: Run tests
+        run: python -m pytest --cov-report=markdown:coverage.md
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          if [ -f coverage.md ]; then
+            echo "## Coverage" >> "$GITHUB_STEP_SUMMARY"
+            cat coverage.md >> "$GITHUB_STEP_SUMMARY"
+          fi

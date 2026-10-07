@@ -1,5 +1,4 @@
-"""
-Data preparation subpackage.
+"""Data preparation subpackage.
 
 Handles data acquisition, target construction, technical indicator
 computation, preprocessing, and exploratory visualization.

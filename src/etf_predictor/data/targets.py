@@ -1,8 +1,7 @@
-"""
-targets.py
-----------
-Constructs the binary classification target Γ(t) as defined in
-Sagaceta-Mejía et al. (2024), Section 2.4.
+"""Build the binary classification target Γ(t).
+
+Γ(t) follows the definition in Sagaceta-Mejía et al. (2024),
+Section 2.4.
 
     Γ(t) =  1  if Open(t) − Open(t−1) > 0
             -1  otherwise
@@ -40,6 +39,7 @@ class TargetBuilder:
     >>> builder = TargetBuilder()
     >>> df_with_target = builder.build(df)
     >>> df_with_target["Gamma"].value_counts()
+
     """
 
     def __init__(
@@ -70,6 +70,7 @@ class TargetBuilder:
         ------
         KeyError
             If ``"Open"`` is not a column in *df*.
+
         """
         if "Open" not in df.columns:
             raise KeyError("DataFrame must contain an 'Open' column.")
@@ -112,6 +113,7 @@ class TargetBuilder:
         -------
         pd.Series
             Value counts normalised to fractions.
+
         """
         if self.target_col not in df.columns:
             raise KeyError(

@@ -1,7 +1,4 @@
-"""
-visualization.py
-----------------
-Exploratory Data Analysis visualizations for the ETF dataset.
+"""Exploratory data analysis plots for the ETF dataset.
 
 Reproduces and extends the paper's figures:
     - Figure 1 style: ETF open price behaviour over time
@@ -18,7 +15,6 @@ be saved or embedded in a Quarto report.
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
@@ -79,6 +75,7 @@ class EDAVisualizer:
     >>> viz = EDAVisualizer()
     >>> fig = viz.plot_open_prices(raw_data)
     >>> fig.savefig("reports/figures/open_prices.png", dpi=150)
+
     """
 
     def __init__(
@@ -104,7 +101,7 @@ class EDAVisualizer:
     def plot_open_prices(
         self,
         raw_data: dict[str, pd.DataFrame],
-        tickers: Optional[list[str]] = None,
+        tickers: list[str] | None = None,
         normalize: bool = True,
     ) -> Figure:
         """Plot normalised (or raw) Open prices for all ETFs.
@@ -124,6 +121,7 @@ class EDAVisualizer:
         Returns
         -------
         Figure
+
         """
         tickers = tickers or list(raw_data.keys())
         fig, ax = plt.subplots(figsize=self.fig_size)
@@ -150,7 +148,7 @@ class EDAVisualizer:
     def plot_cumulative_gamma(
         self,
         processed_data: dict[str, pd.DataFrame],
-        tickers: Optional[list[str]] = None,
+        tickers: list[str] | None = None,
         target_col: str = "Gamma",
     ) -> Figure:
         """Plot cumulative sum of Γ over time (paper Figure 3 style).
@@ -170,6 +168,7 @@ class EDAVisualizer:
         Returns
         -------
         Figure
+
         """
         tickers = tickers or list(processed_data.keys())
         fig, ax = plt.subplots(figsize=self.fig_size)
@@ -215,6 +214,7 @@ class EDAVisualizer:
         Returns
         -------
         Figure
+
         """
         tickers = list(processed_data.keys())
         up_vals = []
@@ -230,8 +230,12 @@ class EDAVisualizer:
         width = 0.35
 
         fig, ax = plt.subplots(figsize=(8, 4))
-        bars_up = ax.bar(x - width / 2, up_vals, width, label="UP (+1)", color="#4C72B0")
-        bars_dn = ax.bar(x + width / 2, down_vals, width, label="DOWN (−1)", color="#DD8452")
+        bars_up = ax.bar(
+            x - width / 2, up_vals, width, label="UP (+1)", color="#4C72B0"
+        )
+        bars_dn = ax.bar(
+            x + width / 2, down_vals, width, label="DOWN (−1)", color="#DD8452"
+        )
 
         ax.set_title("Class Balance per ETF")
         ax.set_ylabel("Percentage (%)")
@@ -280,6 +284,7 @@ class EDAVisualizer:
         Returns
         -------
         Figure
+
         """
         nan_mask = df.isna().iloc[:, :max_cols]
         fig, ax = plt.subplots(figsize=(14, 4))
@@ -306,7 +311,7 @@ class EDAVisualizer:
     def plot_correlation_heatmap(
         self,
         df: pd.DataFrame,
-        cols: Optional[list[str]] = None,
+        cols: list[str] | None = None,
         ticker: str = "",
     ) -> Figure:
         """Pearson correlation heatmap for selected feature columns.
@@ -324,6 +329,7 @@ class EDAVisualizer:
         Returns
         -------
         Figure
+
         """
         if cols is None:
             numeric = df.select_dtypes(include="number").columns.tolist()
@@ -347,7 +353,7 @@ class EDAVisualizer:
 
     def plot_sector_exposure(
         self,
-        sector_weights: Optional[dict[str, dict[str, float]]] = None,
+        sector_weights: dict[str, dict[str, float]] | None = None,
     ) -> Figure:
         """Horizontal bar chart of top sector weights per ETF.
 
@@ -360,6 +366,7 @@ class EDAVisualizer:
         Returns
         -------
         Figure
+
         """
         weights = sector_weights or SECTOR_WEIGHTS
         tickers = list(weights.keys())
@@ -371,14 +378,14 @@ class EDAVisualizer:
 
         colors = plt.cm.tab10.colors  # type: ignore[attr-defined]
 
-        for ax, ticker in zip(axes, tickers):
+        for ax, ticker in zip(axes, tickers, strict=False):
             sectors = list(weights[ticker].keys())
             values = list(weights[ticker].values())
             bars = ax.barh(sectors, values, color=colors[: len(sectors)])
             ax.set_title(ticker, fontweight="bold")
             ax.set_xlabel("Weight (%)")
             ax.invert_yaxis()
-            for bar, val in zip(bars, values):
+            for bar, val in zip(bars, values, strict=True):
                 ax.text(
                     val + 0.3,
                     bar.get_y() + bar.get_height() / 2,
@@ -409,6 +416,7 @@ class EDAVisualizer:
             Mapping of filename stem → Figure.
         output_dir : str
             Directory to write PNG files.
+
         """
         from pathlib import Path  # noqa: PLC0415
 

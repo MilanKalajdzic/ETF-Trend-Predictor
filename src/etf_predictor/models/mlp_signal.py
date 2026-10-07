@@ -1,12 +1,12 @@
-"""
-Multilayer perceptron that predicts the trend-direction signal
-Γ(t) ∈ {+1, -1} directly as a binary classification task.
+"""Multilayer perceptron that predicts the trend direction Γ(t).
+
+The target Γ(t) ∈ {+1, -1} is learned directly as a binary
+classification task.
 """
 
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -44,6 +44,7 @@ class MLPSignalModel:
     """MLP classifier that predicts Γ(t) from indicator features.
 
     Parameters
+    ----------
     hidden_sizes : tuple[int, int]
     dropout : float
     learning_rate : float
@@ -52,6 +53,7 @@ class MLPSignalModel:
     weight_decay : float
     device : str or None
     random_state : int
+
     """
 
     def __init__(
@@ -62,7 +64,7 @@ class MLPSignalModel:
         epochs: int = 30,
         batch_size: int = 64,
         weight_decay: float = 1e-5,
-        device: Optional[str] = None,
+        device: str | None = None,
         random_state: int = 42,
     ) -> None:
         self.hidden_sizes = hidden_sizes
@@ -74,20 +76,24 @@ class MLPSignalModel:
         self.random_state = random_state
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
 
-        self._model: Optional[_MLPNet] = None
-        self._feature_cols: Optional[list[str]] = None
+        self._model: _MLPNet | None = None
+        self._feature_cols: list[str] | None = None
 
 
-    def fit(self, X: pd.DataFrame, y: pd.Series) -> "MLPSignalModel":
-        """
-        Train the MLP on (X, y)
+    def fit(self, X: pd.DataFrame, y: pd.Series) -> MLPSignalModel:
+        """Train the MLP on (X, y).
 
         Parameters
+        ----------
         X : pd.DataFrame
+            Scaled training features.
         y : pd.Series
+            Target labels in {+1, -1}.
 
         Returns
+        -------
         MLPSignalModel
+
         """
         torch.manual_seed(self.random_state)
         np.random.seed(self.random_state)
@@ -145,15 +151,14 @@ class MLPSignalModel:
         return probs
 
     def predict_signal(self, X: pd.DataFrame) -> np.ndarray:
-        """
-        Return trading signal ∈ {+1, -1} for each row of *X*.
+        """Return trading signal ∈ {+1, -1} for each row of *X*.
 
         +1 = long, -1 = short. Probabilities ≥ 0.5 map to +1.
         """
         probs = self.predict_proba(X)
         return np.where(probs >= 0.5, 1, -1).astype(np.int8)
 
-   
+
 
     def _check_fitted(self) -> None:
         if self._model is None:

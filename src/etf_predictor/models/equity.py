@@ -1,12 +1,10 @@
-"""
-Equity-curve construction and visualisation for walk-forward backtests
-"""
+"""Equity-curve construction and visualisation for walk-forward backtests."""
 
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,16 +18,18 @@ TRADING_DAYS = 252
 
 
 def equity_curve(strategy_returns: pd.Series) -> pd.Series:
-    """
-    Compound a return series into equity curve.
+    """Compound a return series into equity curve.
 
     Parameters
+    ----------
     strategy_returns : pd.Series
         Daily simple returns. NaNs are treated as 0 (no position effect).
 
     Returns
+    -------
     pd.Series
         Equity values; index preserved.
+
     """
     r = strategy_returns.fillna(0.0)
     return (1.0 + r).cumprod()
@@ -37,9 +37,7 @@ def equity_curve(strategy_returns: pd.Series) -> pd.Series:
 
 def buy_and_hold_curve(
     close_unscaled: pd.Series, index: pd.Index) -> pd.Series:
-    """
-    Buy-and-hold equity curve aligned with *index*.
-    """
+    """Buy-and-hold equity curve aligned with *index*."""
     close = close_unscaled.reindex(index).ffill()
     return close / close.iloc[0]
 
@@ -115,16 +113,19 @@ def build_comparison(
     """Build aligned equity curves and a metrics table for several models.
 
     Parameters
+    ----------
     results : iterable of WalkForwardResult
         Each model's walk-forward output.
     close_unscaled : pd.Series
         Unscaled close price used to construct the buy-and-hold baseline.
 
     Returns
+    -------
     (curves, metrics) : tuple of pd.DataFrame
         ``curves`` is indexed by date, one column per model plus
         ``"BuyAndHold"``. ``metrics`` has one row per model and the
         buy-and-hold baseline.
+
     """
     results = list(results)
     if not results:
@@ -164,12 +165,13 @@ def build_comparison(
 def plot_equity_curves(
     curves: pd.DataFrame,
     title: str = "Walk-forward equity curves",
-    out_path: Optional[str | Path] = None,
+    out_path: str | Path | None = None,
     figsize: tuple[float, float] = (11.0, 6.0),
 ) -> plt.Figure:
     """Plot model equity curves on a single axes.
 
     Parameters
+    ----------
     curves : pd.DataFrame
         Output of :func:`build_comparison`.
     title : str
@@ -182,6 +184,7 @@ def plot_equity_curves(
     Return
     matplotlib.figure.Figure
         The created figure (also displayed if ``out_path`` is ``None``).
+
     """
     fig, ax = plt.subplots(figsize=figsize)
     styles = {
@@ -213,7 +216,7 @@ def plot_equity_curves(
 def plot_fold_metric(
     fold_metrics: dict[str, pd.DataFrame],
     metric: str = "accuracy",
-    out_path: Optional[str | Path] = None,
+    out_path: str | Path | None = None,
     figsize: tuple[float, float] = (10.0, 4.5),
 ) -> plt.Figure:
     """Bar chart of a per-fold metric across models.
@@ -227,6 +230,9 @@ def plot_fold_metric(
         ``"mean_return"``).
     out_path : str or Path or None
         If provided, save the figure here.
+    figsize : tuple of float
+        Figure size in inches.
+
     """
     fig, ax = plt.subplots(figsize=figsize)
     width = 0.8 / max(len(fold_metrics), 1)
