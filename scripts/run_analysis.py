@@ -4,6 +4,7 @@ import pandas as pd
 from etf_predictor.analysis.correlation_analysis import CorrelationAnalyzer
 from etf_predictor.analysis.feature_analysis import FeatureAnalyzer
 from etf_predictor.analysis.feature_importance import FeatureImportanceAnalyzer
+from etf_predictor.data.loader import YahooFinanceLoader
 from etf_predictor.data.pipeline import DataPipeline
 from etf_predictor.analysis.time_series import TimeSeriesAnalyzer
 
@@ -11,6 +12,17 @@ from etf_predictor.analysis.time_series import TimeSeriesAnalyzer
 def main() -> None:
     pipeline = DataPipeline()
     datasets = pipeline.run()
+
+    # ADF and ARIMA need the raw price series. The processed "Close" column
+    # is min-max scaled with an expanding window, a non-linear transform
+    # that would distort both the stationarity test and the forecast errors.
+    raw_data = YahooFinanceLoader(
+        tickers=list(datasets),
+        start=pipeline.start,
+        end=pipeline.end,
+        cache_dir=pipeline.cache_dir,
+        include_benchmark=False,
+    ).load()
 
     results_dir = Path("reports/results")
     results_dir.mkdir(parents=True, exist_ok=True)
@@ -82,8 +94,11 @@ def main() -> None:
         print("\nTarget distribution:")
         print(y.value_counts(normalize=True))
 
-        if "Close" in df.columns:
-            ts_analyzer = TimeSeriesAnalyzer(df["Close"])
+        if ticker in raw_data:
+            close = raw_data[ticker]["Close"]
+            if isinstance(close, pd.DataFrame):
+                close = close.iloc[:, 0]
+            ts_analyzer = TimeSeriesAnalyzer(close.reindex(df.index))
 
             adf_results = ts_analyzer.adf_test()
             arima_eval = ts_analyzer.evaluate_holdout(order=(1, 1, 1))
