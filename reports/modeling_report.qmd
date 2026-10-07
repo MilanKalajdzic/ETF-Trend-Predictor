@@ -357,9 +357,10 @@ costs[[
 ]].round(2)
 ```
 
-At 5 bps per trade the EUFN MLP falls to buy-and-hold levels, and the
-only other run that beats buy-and-hold before costs (FEZ LSTM on the
-top-10 features) falls below it at 2 bps.
+At about 5.5 bps per trade the EUFN MLP falls to buy-and-hold levels
+(5 bps for its top-10 version), and the FEZ LSTM on the top-10
+features, the only other run that beats buy-and-hold before costs,
+falls below it at 1 bp.
 
 ---
 
