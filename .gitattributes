@@ -1,0 +1,5 @@
+# Rendered reports and generated pages are build output, not source code.
+# Keep them out of GitHub's language statistics so the repo shows as Python.
+reports/*.html linguist-generated=true
+site/*.html linguist-documentation=true
+assets/*.html linguist-documentation=true
