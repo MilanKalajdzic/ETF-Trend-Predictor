@@ -246,15 +246,13 @@ Raw prices are cached as parquet under `data/raw/` and are not committed. IEUR h
 
 ## Team
 
-Built by three students as a university project on reproducible research:
+Started as a three-person university project on reproducible research, then extended by Milan as a portfolio project.
 
-| | Focus |
+| | Contribution |
 |:---|:---|
-| **Milan Kalajdzic** | Data pipeline: price loading, indicators, target, causal preprocessing and the look-ahead tests; EDA report |
+| **Milan Kalajdzic** | Data pipeline (price loading, indicators, target, causal preprocessing and the look-ahead tests) and EDA report. After submission: the return-based LSTM, trading-cost analysis, the modeling report rewrite, CI, the multi-platform Docker image and the project site |
+| **Max Kulicki** | Original MLP and LSTM models, walk-forward validator, equity curves and the first Docker setup |
 | **Erind Jasini** | Statistical analysis: feature redundancy, Random Forest importance, ADF tests and the ARIMA baseline |
-| **Max Kulicki** | Modeling: MLP and LSTM, walk-forward validation, equity curves and the first modeling report |
-
-The Docker setup, Makefile and final integration were shared. After submission, Milan extended the project with trading-cost analysis, the return-based LSTM, CI and the project site.
 
 ---
 
