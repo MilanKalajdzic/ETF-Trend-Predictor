@@ -70,10 +70,7 @@ docker run --rm -v "${PWD}/output:/output" milankalajdzic/etf-predictor:latest
 
 </details>
 
-The default command (`make report`) runs the whole pipeline from scratch: download and process data, statistical analysis, MLP and LSTM walk-forward training, render all three Quarto reports and copy them to `output/`. Expect **10 to 15 minutes** on CPU.
-
-> [!TIP]
-> On Apple Silicon, if the pull fails, add `--platform linux/amd64` to both the `pull` and `run` commands.
+The default command (`make report`) runs the whole pipeline from scratch: download and process data, statistical analysis, MLP and LSTM walk-forward training, render all three Quarto reports and copy them to `output/`. Expect **10 to 15 minutes** on CPU. The image is built for both Intel/AMD and Apple Silicon machines.
 
 ---
 
@@ -244,6 +241,20 @@ Raw prices are cached as parquet under `data/raw/` and are not committed. IEUR h
 - **Same-day label.** Following the paper, Γ(t) is predicted from same-day indicators, so the Random Forest accuracy in the statistical report (76 to 81%) measures contemporaneous fit rather than forecasting skill. The MLP is trained on the same label but its signal trades the next day's return, so a next-day target would match training to trading.
 - **Simple cost model.** Trading costs are a flat charge per unit traded (see [Transaction costs](#transaction-costs)). Borrowing costs for the short side and market impact are not modelled.
 - **One seed per model.** Each network is trained with a single fixed seed, so how much these Sharpe ratios vary between training runs is unknown.
+
+---
+
+## Team
+
+Built by three students as a university project on reproducible research:
+
+| | Focus |
+|:---|:---|
+| **Milan Kalajdzic** | Data pipeline: price loading, indicators, target, causal preprocessing and the look-ahead tests; EDA report |
+| **Erind Jasini** | Statistical analysis: feature redundancy, Random Forest importance, ADF tests and the ARIMA baseline |
+| **Max Kulicki** | Modeling: MLP and LSTM, walk-forward validation, equity curves and the first modeling report |
+
+The Docker setup, Makefile and final integration were shared. After submission, Milan extended the project with trading-cost analysis, the return-based LSTM, CI and the project site.
 
 ---
 
