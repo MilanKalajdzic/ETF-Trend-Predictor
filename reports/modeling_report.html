@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Milan Kalajdzic">
-<meta name="dcterms.date" content="2026-10-07">
+<meta name="dcterms.date" content="2026-10-08">
 
 <title>ETF Trend Prediction — Modeling Report</title>
 <style>
@@ -2223,6 +2223,10 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 body.quarto-dark .figure-img {
 filter: invert(0.865) hue-rotate(180deg);
 }
+
+body.quarto-dark :is(h1, h2, h3, h4, h5, h6) code {
+background-color: rgba(67, 67, 67, 0.65);
+}
 </style>
 
   <script>/*
@@ -2593,7 +2597,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">October 7, 2026</p>
+      <p class="date">October 8, 2026</p>
     </div>
   </div>
   
@@ -2840,7 +2844,7 @@ fold k:  train = [0 : 750+(k-1)·120]  test = [750+(k-1)·120 : 750+k·120]</cod
 </section>
 <section id="eufn-ishares-msci-europe-financials" class="level3">
 <h3 class="anchored" data-anchor-id="eufn-ishares-msci-europe-financials">5.1 EUFN — iShares MSCI Europe Financials</h3>
-<div id="60aee102" class="cell" data-execution_count="2">
+<div id="8dab61dc" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>metrics_all[<span class="st">&quot;EUFN&quot;</span>].<span class="bu">round</span>(<span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -2933,7 +2937,7 @@ fold k:  train = [0 : 750+(k-1)·120]  test = [750+(k-1)·120 : 750+k·120]</cod
 </section>
 <section id="fez-spdr-euro-stoxx-50" class="level3">
 <h3 class="anchored" data-anchor-id="fez-spdr-euro-stoxx-50">5.2 FEZ — SPDR EURO STOXX 50</h3>
-<div id="99d06fee" class="cell" data-execution_count="3">
+<div id="5a12195f" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>metrics_all[<span class="st">&quot;FEZ&quot;</span>].<span class="bu">round</span>(<span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -3026,7 +3030,7 @@ fold k:  train = [0 : 750+(k-1)·120]  test = [750+(k-1)·120 : 750+k·120]</cod
 </section>
 <section id="ieur-ishares-core-msci-europe" class="level3">
 <h3 class="anchored" data-anchor-id="ieur-ishares-core-msci-europe">5.3 IEUR — iShares Core MSCI Europe</h3>
-<div id="b14209cf" class="cell" data-execution_count="4">
+<div id="8d231490" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>metrics_all[<span class="st">&quot;IEUR&quot;</span>].<span class="bu">round</span>(<span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -3119,7 +3123,7 @@ fold k:  train = [0 : 750+(k-1)·120]  test = [750+(k-1)·120 : 750+k·120]</cod
 </section>
 <section id="ivv-ishares-core-sp-500-us-benchmark" class="level3">
 <h3 class="anchored" data-anchor-id="ivv-ishares-core-sp-500-us-benchmark">5.4 IVV — iShares Core S&amp;P 500 (US benchmark)</h3>
-<div id="2024c8c9" class="cell" data-execution_count="5">
+<div id="e6c29a13" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>metrics_all[<span class="st">&quot;IVV&quot;</span>].<span class="bu">round</span>(<span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
