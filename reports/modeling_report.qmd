@@ -23,6 +23,11 @@ format:
           body.quarto-dark .figure-img {
             filter: invert(0.865) hue-rotate(180deg);
           }
+          /* The dark theme gives inline code in headings a light
+             background; match the dark background used in body text. */
+          body.quarto-dark :is(h1, h2, h3, h4, h5, h6) code {
+            background-color: rgba(67, 67, 67, 0.65);
+          }
         </style>
 execute:
   warning: false
